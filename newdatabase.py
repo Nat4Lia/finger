@@ -1,3 +1,4 @@
+#v.1.0
 from subprocess import check_call as run
 import os
 import mysql.connector
