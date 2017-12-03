@@ -305,6 +305,8 @@ class proses(inisialisasi):
                                 self.cnx.commit()
                                 lcd_.printLCD('Success Uploading','%s Data' % totalUpload).lcd_status()
                                 print 'Success Updating %s Data' % totalUpload
+		else:
+                    lcd_.printLCD('Tidak Ada Data','Absensi Baru').lcd_status()
 
     def setUser(self):
         if self.koneksifinger & self.koneksiinternet :
