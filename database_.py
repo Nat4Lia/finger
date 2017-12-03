@@ -32,7 +32,8 @@ URL = {
 		'AMBILMAC'		: 'http://eabsen.kalselprov.go.id/api/macaddress',
 		'CEKIDPEGAWAI'	: 'http://eabsen.kalselprov.go.id/api/cekpegawaidata/%s',
 		'CEKIDADMIN'	: 'http://eabsen.kalselprov.go.id/api/admin/finger/%s',
-        'CEKVERSI'	    : 'http://eabsen.kalselprov.go.id/api/version'
+        'CEKVERSI'	    : 'http://eabsen.kalselprov.go.id/api/version',
+        'ERRORUSER'     : 'http://eabsen.kalselprov.go.id/api/logerror'
 }
 
 SQL_SYNTAX = {
@@ -305,9 +306,8 @@ class proses(inisialisasi):
                                 self.cnx.commit()
                                 lcd_.printLCD('Success Uploading','%s Data' % totalUpload).lcd_status()
                                 print 'Success Updating %s Data' % totalUpload
-		else:
+                else:
                     lcd_.printLCD('Tidak Ada Data','Absensi Baru').lcd_status()
-
     def setUser(self):
         if self.koneksifinger & self.koneksiinternet :
             print 'Manajemen User Fingerprint'
@@ -377,6 +377,13 @@ class proses(inisialisasi):
                                     totalNewPeg += 1
                                     print 'Sukses menambahkan template finger %s' % NAMA
                                     lcd_.printLCD('Update','%s Pegawai Baru' % totalNewPeg).lcd_status()
+                                else:
+                                    headers = {'Content-Type' : 'application/json', 'Accept' : 'application/json'}
+                                    payload = {'user_id' : ID, 'nama' : NAMA}
+                                    time.sleep(3)
+                                    if requestPOST(URL['ERRORUSER'], headers, payload).status_code is 200:
+                                        lcd_.printLCD('User %' % ID,'Error').lcd_status()
+                                        print 'User %s Tidak Terdaftar' % ID
                 else:
                     lcd_.printLCD('Tidak Ada Update','Pegawai Baru').lcd_status()
 
@@ -536,7 +543,6 @@ class proses(inisialisasi):
 
     def clearLog(self):
         if self.koneksifinger :
-            lcd_.printLCD('Menghapus Log','Fingerprint').lcd_status()
             print 'Menghapus Log Di Fingerprint'
             if self.checkMac:
                 dataLog = None
@@ -552,6 +558,7 @@ class proses(inisialisasi):
 
                 if (jumlahLogLocal & jumlahDataLog) >= 100000 :
                     print 'Menghapus Log di LocalHost'
+                    lcd_.printLCD('Menghapus Log','Fingerprint').lcd_status()
                     parsingFromFinger(getDataFinger.clearData(self.tujuan, self.alamat, 0,3).get())
                     time.sleep(10)
                     if clear is None:
