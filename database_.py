@@ -382,7 +382,7 @@ class proses(inisialisasi):
                                     payload = {'user_id' : ID, 'nama' : NAMA}
                                     time.sleep(3)
                                     if requestPOST(URL['ERRORUSER'], headers, payload).status_code is 200:
-                                        lcd_.printLCD('User %' % ID,'Error').lcd_status()
+                                        lcd_.printLCD('User %s' % ID,'Error').lcd_status()
                                         print 'User %s Tidak Terdaftar' % ID
                 else:
                     lcd_.printLCD('Tidak Ada Update','Pegawai Baru').lcd_status()
