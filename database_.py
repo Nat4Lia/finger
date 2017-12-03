@@ -337,7 +337,7 @@ class proses(inisialisasi):
 
                 if selisih > 0 :
                     lcd_.printLCD('Ditemukan %s' % selisih,'Baru').lcd_status()
-                    for pegawai in range (jumlahPegLoc, jumlahPegSer):
+                    for pegawai in range (0, jumlahPegSer):
                         ID =  listPegawai[0][pegawai]['id']
                         NAMA = listPegawai[0][pegawai]['nama'].replace("'"," ")
                         self.cursor.execute(SQL_SYNTAX['FINDPEGAWAI'], (ID, macFinger,))
