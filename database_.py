@@ -32,7 +32,7 @@ URL = {
 		'AMBILMAC'		: 'http://eabsen.kalselprov.go.id/api/macaddress',
 		'CEKIDPEGAWAI'	: 'http://eabsen.kalselprov.go.id/api/cekpegawaidata/%s',
 		'CEKIDADMIN'	: 'http://eabsen.kalselprov.go.id/api/admin/finger/%s',
-        'CEKVERSI'	: 'http://eabsen.kalselprov.go.id/api/version'
+        'CEKVERSI'	    : 'http://eabsen.kalselprov.go.id/api/version'
 }
 
 SQL_SYNTAX = {
@@ -195,31 +195,29 @@ def clone():
             getVersion = [None, False]
             while not getVersion[1]:
                 getVersion = loadJSON(requestGET(URL['CEKVERSI']))
-            versionSer = getVersion[0][0]['version']
-            cursor.execute(SQL_SYNTAX['CHECKMAC'])
+            print getVersion
+            versionSer = getVersion[0]['version']
+            print 'Versi server %s' % versionSer
+            cursor.execute(SQL_SYNTAX['CHECKVERSION'])
             fetch = cursor.fetchone()
             versionLoc = fetch[0]
-
+            print 'versi local %s' % versionLoc
             if versionLoc != versionSer :
                 if os.path.isdir(SRC) :
                     print os.path.isdir(SRC)
                     run(CMD['REMOVESOURCE'] % SRC,shell=True)
                     run(CMD['CLONETOSOURCE'] % SRC,shell=True)
                     run(CMD['COPYTOETC'], shell=True)
-                    run(CMD['REBOOT'], shell=True)
                     cursor.execute(SQL_SYNTAX['UPDATEVERSION'], (versionSer,))
                     cnx.commit()
-
                 else :
                     os.path.isdir(SRC)
                     run(CMD['CLONETOSOURCE'] % SRC,shell=True)
                     run(CMD['COPYTOETC'], shell=True)
-                    run(CMD['REBOOT'], shell=True)
                     cursor.execute(SQL_SYNTAX['ADDVERSION'], (versionSer,))
                     cnx.commit()
-
                 print 'Updating to Version %s' % versionSer
-
+                run(CMD['REBOOT'], shell=True)
 class inisialisasi:
     def __init__ (self, tujuan, alamat):
         global macFinger
