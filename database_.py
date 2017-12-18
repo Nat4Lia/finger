@@ -148,6 +148,17 @@ def loadJSON(data):
     else:
         return data, False
 
+def cekPegFinger(tujuan, alamat, comKey, ID):
+    cekUserFinger = None
+    while cekUserFinger is None:
+        cekUserFinger = parsingFromFinger(getDataFinger.getUserInfo(tujuan, alamat, comKey, ID).get())
+    if len(cekUserFinger) == 0:
+        return False
+    elif len(cekUserFinger) == 1:
+        if str(ID) == cekUserFinger[0][6].text:
+            return True
+        else :
+            return False
 # def regisTemplate(dataTemplate, fingerID) :
 
 macFinger = None
@@ -175,6 +186,16 @@ def addMacToLocalHost():
                 print '%s. %s Ditambahkan Ke LocalHost' % (dataMac+1, mac)
                 cursor.execute(SQL_SYNTAX['ADDMAC'], (mac,))
                 cnx.commit()
+
+def clearDataLog(tujuan, alamat, cursor):
+    print 'Clear Log'
+    lcd_.printLCD('Clear Log',' ').lcd_status()
+    cursor.execute(SQL_SYNTAX['TRUNCATE'])
+    getDataFinger.clearData(tujuan, alamat, 0,3).get()
+    time.sleep(10)
+    print 'Restarting...'
+    lcd_.printLCD('Restarting','...').lcd_status()
+    run('sudo reboot', shell=True)
 
 def clone():
     SRC = '/home/pi/finger'
@@ -212,7 +233,7 @@ def clone():
                     cursor.execute(SQL_SYNTAX['UPDATEVERSION'], (versionSer,))
                     cnx.commit()
                 else :
-                    os.path.isdir(SRC)
+                    print os.path.isdir(SRC)
                     run(CMD['CLONETOSOURCE'] % SRC,shell=True)
                     run(CMD['COPYTOETC'], shell=True)
                     cursor.execute(SQL_SYNTAX['ADDVERSION'], (versionSer,))
@@ -259,8 +280,17 @@ class proses(inisialisasi):
             jumlahDataLog = 0
             print 'Status Check Mac %s' % self.checkMac
             if self.checkMac:
+                counter = 0
                 while dataLog is None :
-                    dataLog = parsingFromFinger(getDataFinger.getAttLog(self.tujuan, self.alamat, 0,'All').get())
+                    data = getDataFinger.getAttLog(self.tujuan, self.alamat, 0,'All').get()
+                    try :
+                        dataLog = ET.fromstring(data)
+                    except ET.ParseError as err :
+                        clearDataLog(self.tujuan, self.alamat, self.cursor)
+                    except IndexError as err:
+                        clearDataLog(self.tujuan, self.alamat, self.cursor)
+                    except ValueError as err:
+                        clearDataLog(self.tujuan, self.alamat, self.cursor)
                 jumlahDataLog = len(dataLog)
                 print 'Jumlah Data Log %s' % jumlahDataLog
 
@@ -296,18 +326,28 @@ class proses(inisialisasi):
                         headers = {'Content-Type' : 'application/json', 'Accept' : 'application/json'}
                         payload = {'status' : s_status, 'instansi' : ID_INSTANSI, 'jam' : jam, 'tanggal' : tanggal, 'user_id' : PIN, 'token' : encryption }
 
-                        if requestPOST(URL['ATTENDACE'], headers, payload).status_code is 200:
+                        statusCode = None
+                        while statusCode is not 200:
+                            time.sleep(2)
+                            print 'Mengirim Log Ke Server'
+                            statusCode = requestPOST(URL['ATTENDACE'], headers, payload).status_code
+                            print 'status pengiriman %s' % statusCode
+
+                        if statusCode is 200:
                             self.cursor.execute(SQL_SYNTAX['ADDATTENDANCE'], (PIN, MAC,))
                             totalUpload += 1
+                            lcd_.printLCD('Upload','Sukses').lcd_status()
                             lcd_.printLCD('Uploading...','%s Data' % totalUpload).lcd_status()
                             print 'Updating %s Data, ID = %s, Jam = %s' % (totalUpload, PIN, jam)
                             print 'Upload Sukses'
+                            self.cnx.commit()
                             if totalUpload == selisih :
-                                self.cnx.commit()
                                 lcd_.printLCD('Success Uploading','%s Data' % totalUpload).lcd_status()
                                 print 'Success Updating %s Data' % totalUpload
+
                 else:
                     lcd_.printLCD('Tidak Ada Data','Absensi Baru').lcd_status()
+
     def setUser(self):
         if self.koneksifinger & self.koneksiinternet :
             print 'Manajemen User Fingerprint'
@@ -323,18 +363,14 @@ class proses(inisialisasi):
                 fetch = self.cursor.fetchone()
                 jumlahPegLoc = fetch[0]
                 print 'Jumlah Pegawai Di LocalHost %s' % jumlahPegLoc
-
                 listPegawai = [None,False]
                 while not listPegawai[1]:
                     listPegawai = loadJSON(requestGET(URL['CEKPEGAWAI']))
                 jumlahPegSer = len(listPegawai[0])
                 print 'Jumlah Pegawai di Server %s' % jumlahPegSer
-
                 totalNewPeg = 0
-
                 selisih = jumlahPegSer - jumlahPegLoc
                 print 'Selisih %s' % selisih
-
                 if selisih > 0 :
                     lcd_.printLCD('Ditemukan %s' % selisih,'Baru').lcd_status()
                     for pegawai in range (0, jumlahPegSer):
@@ -343,11 +379,12 @@ class proses(inisialisasi):
                         self.cursor.execute(SQL_SYNTAX['FINDPEGAWAI'], (ID, macFinger,))
                         cekPegLoc = self.cursor.fetchone()
                         print 'Cek Pegawai %s di LocalHost' % ID
-                        if cekPegLoc is None :
-                            # hapusUser = None
-                            # while hapusUser is None:
+                        if cekPegLoc is None or not cekPegFinger(self.tujuan, self.alamat, 0, ID):
                             hapusUser = parsingFromFinger(getDataFinger.delUser(self.tujuan, self.alamat, 0, ID).delete())
-                            print 'Menghapus User %s' % (ID)
+                            print 'Menghapus User %s di fingerprint' % (ID)
+                            self.cursor.execute(SQL_SYNTAX['DELETEPEGAWAI'], (ID, macFinger,))
+                            self.cnx.commit()
+                            print 'Menghapus User %s di localhost' % (ID)
                             fingerPegawai = [None,False]
                             while not fingerPegawai[1]:
                                 time.sleep(0.7)
@@ -369,6 +406,8 @@ class proses(inisialisasi):
                                         finger_template = fingerPegawai[0][fingerID]['templatefinger']
                                         statusSetTemplate = None
                                         while statusSetTemplate is None:
+                                            print 'Mendaftarkan Finger ID %s' % fingerID
+                                            lcd_.printLCD('Mendaftarkan','Finger ID %s' % fingerID).lcd_status()
                                             statusSetTemplate = parsingFromFinger(getDataFinger.setUserTemplate(self.tujuan, self.alamat, 0, pegawai_id, fingerID, size, valid, finger_template).get())
                                         status[fingerID] = statusSetTemplate[0][1].text
                                 if (status[0] and status[1]) == 'Successfully!':
@@ -383,7 +422,7 @@ class proses(inisialisasi):
                                     time.sleep(3)
                                     if requestPOST(URL['ERRORUSER'], headers, payload).status_code is 200:
                                         lcd_.printLCD('User %s' % ID,'Error').lcd_status()
-                                        print 'User %s Tidak Terdaftar' % ID
+                                        print 'User %s Gagal Terdaftar' % ID
                 else:
                     lcd_.printLCD('Tidak Ada Update','Pegawai Baru').lcd_status()
 
@@ -483,10 +522,11 @@ class proses(inisialisasi):
                                         status[fingerID] = statusSetTemplate[0][1].text
                                         print 'Template %s Added' % status[fingerID]
                                 if (status[0] and status[1]) == 'Successfully!':
+                                    self.cursor.execute(SQL_SYNTAX['ADDPEGAWAI'], (ID, NAMA, macFinger,))
                                     self.cursor.execute(SQL_SYNTAX['ADDADMIN'], (ID, NAMA, macFinger,))
                                     self.cnx.commit()
                                     lcd_.printLCD('Sukses Menambahkan','Admin').lcd_status()
-                elif selisih == 0:
+                elif selisih <= 0:
                     print 'Cek ID Admin di Tabel dengan Mac %s ' % macFinger
                     self.cursor.execute(SQL_SYNTAX['FINDALLADMIN'], (macFinger,))
                     fetch = self.cursor.fetchall()
@@ -559,11 +599,15 @@ class proses(inisialisasi):
                 if (jumlahLogLocal & jumlahDataLog) >= 100000 :
                     print 'Menghapus Log di LocalHost'
                     lcd_.printLCD('Menghapus Log','Fingerprint').lcd_status()
-                    parsingFromFinger(getDataFinger.clearData(self.tujuan, self.alamat, 0,3).get())
+                    self.cursor.execute(SQL_SYNTAX['TRUNCATE'])
+                    clear = parsingFromFinger(getDataFinger.clearData(self.tujuan, self.alamat, 0,3).get())
                     time.sleep(10)
                     if clear is None:
                         lcd_.printLCD('Clear Log','Successfully!').lcd_status()
 
+
+
+# cekPegFinger('Finger-A','10.10.10.10:80',0,172)
 # P = proses('Finger A','10.10.10.10:80')
 #
 # addMacToLocalHost()

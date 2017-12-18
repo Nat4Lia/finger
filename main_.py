@@ -22,13 +22,13 @@ def checkAlamat() :
             print 'Alamat %s Tidak Valid' % alamat
     print useAlamat
 
-lcd_.printLCD('Starting','%c %c %c' % (32, 32, 32)).lcd_status()
+lcd_.printLCD('Starting v1.1f','%c %c %c' % (32, 32, 32)).lcd_status()
 time.sleep(3)
-lcd_.printLCD('Starting','%c %c %c' % (46, 32, 32)).lcd_status()
+lcd_.printLCD('Starting v1.1f','%c %c %c' % (46, 32, 32)).lcd_status()
 time.sleep(4)
-lcd_.printLCD('Starting','%c %c %c' % (46, 46, 32)).lcd_status()
+lcd_.printLCD('Starting v1.1f','%c %c %c' % (46, 46, 32)).lcd_status()
 time.sleep(5)
-lcd_.printLCD('Starting','%c %c %c' % (46, 46, 46)).lcd_status()
+lcd_.printLCD('Starting v1.1f','%c %c %c' % (46, 46, 46)).lcd_status()
 
 import check_connection
 import getDataFinger
@@ -42,6 +42,6 @@ while True:
         URL = useAlamat[alamat]
         proses = database_.proses(alamat, URL)
         proses.sendLogToServer()
-        proses.setUser()
         proses.setAdmin()
+        proses.setUser()
         proses.clearLog()

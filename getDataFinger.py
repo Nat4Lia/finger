@@ -363,6 +363,7 @@ class getMAC (getDataFinger):
             except socket.timeout as err:
                 check_connection.onCheck(self.teks, self.tryAlamat, 5).check()
 
+
 # comKey = 0
 # userID = 'All'
 # XML = (('<GetAttLog>'
