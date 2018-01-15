@@ -44,7 +44,6 @@ if len(useAlamat) is 0 :
 else:
     lcd_.printLCD ('Raspberry Ini', 'Menggunakan').lcd_status()
     lcd_.printLCD ('%s Buah' % len(useAlamat), 'Fingerprint').lcd_status()
-    database_baru.resetall(useAlamat)
     while True:
         database_baru.clone()
         database_baru.resetall(useAlamat)
