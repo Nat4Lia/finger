@@ -22,13 +22,13 @@ def checkAlamat() :
             pass
 
 
-lcd_.printLCD('Starting v2.0','%c %c %c' % (32, 32, 32)).lcd_status()
+lcd_.printLCD('Starting v2.1','%c %c %c' % (32, 32, 32)).lcd_status()
 time.sleep(3)
-lcd_.printLCD('Starting v2.0','%c %c %c' % (46, 32, 32)).lcd_status()
+lcd_.printLCD('Starting v2.1','%c %c %c' % (46, 32, 32)).lcd_status()
 time.sleep(4)
-lcd_.printLCD('Starting v2.0','%c %c %c' % (46, 46, 32)).lcd_status()
+lcd_.printLCD('Starting v2.1','%c %c %c' % (46, 46, 32)).lcd_status()
 time.sleep(5)
-lcd_.printLCD('Starting v2.0','%c %c %c' % (46, 46, 46)).lcd_status()
+lcd_.printLCD('Starting v2.1','%c %c %c' % (46, 46, 46)).lcd_status()
 
 
 import check_connection
@@ -40,13 +40,14 @@ if len(useAlamat) is 0 :
     time.sleep(10)
     lcd_.printLCD ('Kemudian Restart', 'Raspberry').lcd_status()
     time.sleep(10)
-    
+
 else:
     lcd_.printLCD ('Raspberry Ini', 'Menggunakan').lcd_status()
     lcd_.printLCD ('%s Buah' % len(useAlamat), 'Fingerprint').lcd_status()
     database_baru.resetall(useAlamat)
     while True:
         database_baru.clone()
+        database_baru.resetall(useAlamat)
         database_baru.daftarmac()
         for alamat in useAlamat :
             teks = alamat
