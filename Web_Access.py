@@ -3,8 +3,6 @@ import requests
 import json
 import socket
 import lcd_ as cetak
-#import check_connection as koneksi
-#import lcd_ as tampilkan
 
 URL = {
 		'KEHADIRAN'           : 'http://eabsen.kalselprov.go.id/api/attendance',
@@ -50,14 +48,24 @@ def POST (indeks, header, payload) :
                 return True
         except requests.exceptions.RequestException as err:
             cetak.printLCD('Gagal Mengirim','Data Ke Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.Timeout as err:
             cetak.printLCD('Gagal Mengirim','Data Ke Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.ConnectionError as err:
             cetak.printLCD('Gagal Mengirim','Data Ke Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.HTTPError as err:
             cetak.printLCD('Gagal Mengirim','Data Ke Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.ConnectTimeout as err:
             cetak.printLCD('Gagal Mengirim','Data Ke Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
 
 # Fungsi get
 def GET (URL) :
@@ -69,14 +77,24 @@ def GET (URL) :
                 return r
         except requests.exceptions.RequestException as err:
             cetak.printLCD('Gagal Mengambil','Data Dari Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.Timeout as err:
             cetak.printLCD('Gagal Mengambil','Data Dari Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.ConnectionError as err:
             cetak.printLCD('Gagal Mengambil','Data Dari Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.HTTPError as err:
             cetak.printLCD('Gagal Mengambil','Data Dari Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
         except requests.exceptions.ConnectTimeout as err:
             cetak.printLCD('Gagal Mengambil','Data Dari Server').lcd_status()
+            cetak.printLCD('Mencoba Lagi','...').lcd_status()
+            cetak.printLCD('Mohon Tunggu','...').lcd_status()
 
 # Fungsi Parsing Json
 def loadJSON(data):
