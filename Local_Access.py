@@ -21,31 +21,32 @@ config = {
 
 
 SQL_SYNTAX = {
-                'ADDPEGAWAI' 	      	: 'INSERT INTO pegawai (user_pin2, user_name, mac_) VALUES (%s, %s, %s)',
-                'ADDADMIN' 		: 'INSERT INTO pegawaiAdmin (user_pin2, user_name, mac_) VALUES (%s, %s, %s)',
-                'ADDMAC'		: 'INSERT INTO macaddress (mac_) VALUES (%s)',
-                'ADDATTENDANCE'	      	: 'INSERT INTO attendance (user_pin, mac_) VALUES (%s, %s)',
-                'ADDVERSION'          	: 'INSERT INTO version (version) VALUES = (%s)',
-                'CHECKATTENDACE'      	: 'SELECT COUNT(*) FROM attendance WHERE mac_ = (%s)',
-                'CHECKPEGAWAI'	      	: 'SELECT COUNT(*) FROM pegawai WHERE mac_ = (%s)',
-                'CHECKADMIN'	      	: 'SELECT COUNT(*) FROM pegawaiAdmin WHERE mac_ = (%s)',
-                'CHECKMAC'		: 'SELECT COUNT(*) FROM macaddress',
-                'CHECKVERSION'        	: 'SELECT version FROM version',
-		'DELETEMAC'	      	: 'DELETE FROM macaddress WHERE mac_ = (%s)',
-                'DELETEPEGAWAI'	      	: 'DELETE FROM pegawai WHERE user_pin2 = (%s) AND mac_ = (%s)',
-                'DELETEPEGAWAIID'	: 'DELETE FROM pegawai WHERE id = (%s) AND mac_ = (%s)',
-                'DELETEADMIN'	      	: 'DELETE FROM pegawaiAdmin WHERE user_pin2 = (%s) AND mac_ = (%s)',
-                'DELETEADMINID'	      	: 'DELETE FROM pegawaiAdmin WHERE id = (%s) AND mac_ = (%s)',
-                'DELETEATTENDANCE'    	: 'DELETE FROM attendance WHERE mac_ = (%s)',
-                'FINDMAC'		: 'SELECT mac_ FROM macaddress WHERE mac_ = (%s)',
-                'FINDALLADMIN'	      	: 'SELECT user_pin2 FROM pegawaiAdmin WHERE mac_ = (%s)',
-                'FINDADMIN'		: 'SELECT user_pin2 FROM pegawaiAdmin WHERE user_pin2 = (%s) AND mac_ = (%s)',
-                'FINDPEGAWAI'	      	: 'SELECT user_pin2 FROM pegawai WHERE user_pin2 = (%s) AND mac_ = (%s)',
-                'FINDPEGAWAIALL'      	: 'SELECT * FROM pegawai WHERE user_pin2 = (%s) AND mac_ = (%s)',
-                'FINDADMINALL'        	: 'SELECT * FROM pegawaiAdmin WHERE user_pin2 = (%s) AND mac_ = (%s)',
-                'FINDALLPEGAWAI'      	: 'SELECT user_pin2 FROM pegawai WHERE mac_ = (%s)',
-                'UPDATEVERSION'       	: 'UPDATE version SET version = %s',
-                'TRUNCATE'		: 'TRUNCATE TABLE attendance'
+                'ADDPEGAWAI' 	      : 'INSERT INTO pegawai (user_pin2, user_name, mac_) VALUES (%s, %s, %s)',
+                'ADDADMIN' 		      : 'INSERT INTO pegawaiAdmin (user_pin2, user_name, mac_) VALUES (%s, %s, %s)',
+                'ADDMAC'		      : 'INSERT INTO macaddress (mac_) VALUES (%s)',
+                'ADDATTENDANCE'	      : 'INSERT INTO attendance (user_pin, mac_) VALUES (%s, %s)',
+                'ADDVERSION'          : 'INSERT INTO version (version) VALUES = (%s)',
+                'CHECKATTENDACE'      : 'SELECT COUNT(*) FROM attendance WHERE mac_ = (%s)',
+                'CHECKPEGAWAI'	      : 'SELECT COUNT(*) FROM pegawai WHERE mac_ = (%s)',
+                'CHECKADMIN'	      : 'SELECT COUNT(*) FROM pegawaiAdmin WHERE mac_ = (%s)',
+                'CHECKMAC'		      : 'SELECT COUNT(*) FROM macaddress',
+                'CHECKVERSION'        : 'SELECT version FROM version',
+                'DELETEMAC'	      	  : 'DELETE FROM macaddress WHERE mac_ = (%s)',
+                'DELETEPEGAWAI'	      : 'DELETE FROM pegawai WHERE user_pin2 = (%s) AND mac_ = (%s)',
+                'DELETEPEGAWAIID'	  : 'DELETE FROM pegawai WHERE id = (%s) AND mac_ = (%s)',
+                'DELETEADMIN'	      : 'DELETE FROM pegawaiAdmin WHERE user_pin2 = (%s) AND mac_ = (%s)',
+                'DELETEADMINID'	      : 'DELETE FROM pegawaiAdmin WHERE id = (%s) AND mac_ = (%s)',
+                'DELETEATTENDANCE'    : 'DELETE FROM attendance WHERE mac_ = (%s)',
+                'FINDMAC'		      : 'SELECT mac_ FROM macaddress WHERE mac_ = (%s)',
+                'FINDALLMAC'          : 'SELECT mac_ FROM macaddress',
+                'FINDALLADMIN'	      : 'SELECT user_pin2 FROM pegawaiAdmin WHERE mac_ = (%s)',
+                'FINDADMIN'		      : 'SELECT user_pin2 FROM pegawaiAdmin WHERE user_pin2 = (%s) AND mac_ = (%s)',
+                'FINDPEGAWAI'	      : 'SELECT user_pin2 FROM pegawai WHERE user_pin2 = (%s) AND mac_ = (%s)',
+                'FINDPEGAWAIALL'      : 'SELECT * FROM pegawai WHERE user_pin2 = (%s) AND mac_ = (%s)',
+                'FINDADMINALL'        : 'SELECT * FROM pegawaiAdmin WHERE user_pin2 = (%s) AND mac_ = (%s)',
+                'FINDALLPEGAWAI'      : 'SELECT user_pin2 FROM pegawai WHERE mac_ = (%s)',
+                'UPDATEVERSION'       : 'UPDATE version SET version = %s',
+                'TRUNCATE'		      : 'TRUNCATE TABLE attendance'
 }
 
 class Localhost:
@@ -95,9 +96,14 @@ class Localhost:
         self.cnx.commit()
 
     def hapusmac(self, mac):
-	self.cursor.execute(SQL_SYNTAX['DELETEMAC'], (mac,))
+        self.cursor.execute(SQL_SYNTAX['DELETEMAC'], (mac,))
         self.cnx.commit()
-	
+
+    def cekkesemuamac(self):
+        self.cursor.execute(SQL_SYNTAX['FINDALLMAC'])
+        data = self.cursor.fetchall()
+        return data
+
     def macterdaftar(self, mac):
         self.cursor.execute(SQL_SYNTAX['FINDMAC'], (mac,))
         try:
@@ -268,3 +274,5 @@ class Localhost:
 # print Localhost().cekjumlahmac()
 # for x in range (0, 1500):
 #     print Localhost().normalizelocalhost(x,'00:17:61:11:6A:C2')
+# print Localhost().cekkesemuamac('00:17:61:11:6a:c3')
+# Localhost().cekkesemuamac()
