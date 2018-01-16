@@ -22,13 +22,13 @@ def checkAlamat() :
             pass
 
 
-lcd_.printLCD('Starting v2.1','%c %c %c' % (32, 32, 32)).lcd_status()
+lcd_.printLCD('Starting v2.2','%c %c %c' % (32, 32, 32)).lcd_status()
 time.sleep(3)
-lcd_.printLCD('Starting v2.1','%c %c %c' % (46, 32, 32)).lcd_status()
+lcd_.printLCD('Starting v2.2','%c %c %c' % (46, 32, 32)).lcd_status()
 time.sleep(4)
-lcd_.printLCD('Starting v2.1','%c %c %c' % (46, 46, 32)).lcd_status()
+lcd_.printLCD('Starting v2.2','%c %c %c' % (46, 46, 32)).lcd_status()
 time.sleep(5)
-lcd_.printLCD('Starting v2.1','%c %c %c' % (46, 46, 46)).lcd_status()
+lcd_.printLCD('Starting v2.2','%c %c %c' % (46, 46, 46)).lcd_status()
 
 
 import check_connection
