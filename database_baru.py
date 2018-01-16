@@ -22,7 +22,6 @@ def resetall(usealamat):
                 cetak.printLCD ('Reseting %s' % alamat,'').lcd_status()
                 time.sleep(30)
 
-
 def clone():
     SRC = '/home/pi/finger'
     CMD = {
@@ -169,9 +168,35 @@ def normalizeadmin(tujuan, alamat, mac):
                         Finger.hapuspegawai(tujuan, alamat, pegawaiid)
         return
 
+def normalizemac(datalocal, dataserver):
+    for listmaclocal in range(0,len(datalocal)):
+        try:
+            macL = datalocal[listmaclocal][0]
+            print macL
+            for listmacserver in range(0, len(dataserver)):
+                try:
+                    macS = dataserver[listmacserver]['macaddress']
+                    print macL, macS
+                    if macL != macS :
+                        FungsiLocal.hapusmac(macL)
+                except TypeError as err:
+                    print err
+                except IndexError as err:
+                    print err
+                except ValueError as err:
+                    print err
+        except TypeError as err:
+            print err
+        except IndexError as err:
+            print err
+        except ValueError as err:
+            print err
+
 def daftarmac():
     DAFTARMACADDRESSSERVER  = Server.load('Macaddress',None)
     JUMLAHMACADDRESSSERVER  = len(DAFTARMACADDRESSSERVER)
+    MACLOCAL                = FungsiLocal.cekkesemuamac()
+    normalizemac(MACLOCAL, DAFTARMACADDRESSSERVER)
     JUMLAHMACADDRESSLOCAL   = FungsiLocal.cekjumlahmac()
     SELISIHJUMLAHMAC        = JUMLAHMACADDRESSSERVER - JUMLAHMACADDRESSLOCAL
     if SELISIHJUMLAHMAC > 0:
@@ -253,8 +278,10 @@ class Proses:
                     pass
 
                 if JumlahDaftarBaru == 0:
+                    pass
                     cetak.printLCD('Tidak Ada','Pegawai Baru').lcd_status()
                 else:
+                    pass
                     cetak.printLCD('%s Pegawai Baru' % JumlahDaftarBaru,'Berhasil Ditambahkan').lcd_status()
 
             elif Server.load('Trigger',None) is 2:
@@ -340,8 +367,10 @@ class Proses:
                     pass
 
                 if JumlahDaftarBaru == 0:
+                    pass
                     cetak.printLCD('Tidak Ada','Admin Baru').lcd_status()
                 else:
+                    pass
                     cetak.printLCD('%s Admin Baru' % JumlahDaftarBaru,'Berhasil Ditambahkan').lcd_status()
 
             elif Server.load('Trigger',None) is 2:
@@ -358,6 +387,7 @@ class Proses:
                         print err
                 cetak.printLCD('%s Admin' % JumlahDaftarBaru,'Berhasil Dihapus').lcd_status()
         else:
+            pass
             cetak.printLCD('Mac Fingerprint','Tidak Terdaftar').lcd_status()
             cetak.printLCD('Hubungi Kominfo','Untuk Mendaftarkan').lcd_status()
 
@@ -425,8 +455,10 @@ class Proses:
                     except IndexError as err:
                         print err
             else:
+                pass
                 cetak.printLCD('Tidak Ada','Absensi Baru').lcd_status()
         else:
+            pass
             cetak.printLCD('Mac Fingerprint','Tidak Terdaftar').lcd_status()
             time.sleep(3)
             cetak.printLCD('Hubungi Kominfo','Untuk Mendaftarkan').lcd_status()
@@ -465,7 +497,7 @@ class Proses:
                      'instansi_id'         : instansiid,
                      'token'               : encryption
                     }
-        # print Server.POST('LOGRASPBERRY', headers, payload)
+        print Server.POST('LOGRASPBERRY', headers, payload)
         if Server.POST('LOGRASPBERRY', headers, payload):
             cetak.printLCD('Berhasil Mengirim','Status Raspberry').lcd_status()
         else:
@@ -474,3 +506,4 @@ class Proses:
 # clearlog(tujuan, '10.10.10.10:80', '00:17:61:11:72:24')
 # manajemenuser('Finger A', '10.10.10.10:80')
 # normalizepegawai('Finger A', '10.10.10.10:80','00:17:61:11:72:24')
+# daftarmac()
