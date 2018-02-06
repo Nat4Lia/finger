@@ -53,6 +53,7 @@ class Localhost:
     def __init__ (self):
         self.cnx = mysql.connector.connect(**config)
         self.cursor = self.cnx.cursor(buffered=True)
+        self.cnx.commit()
 
     def hapussemua(self):
         self.cursor.execute('TRUNCATE TABLE attendance')
@@ -78,9 +79,9 @@ class Localhost:
             versionsekarang = self.cursor.fetchone()[0]
             return versionsekarang
         except IndexError as err:
-            print err
+            pass
         except TypeError as err:
-            print err
+            pass
 
     def updateversion(self, version):
         self.cursor.execute(SQL_SYNTAX['UPDATEVERSION'], (version,))
@@ -122,11 +123,11 @@ class Localhost:
         try:
             return self.cursor.fetchone()[0]
         except TypeError as err:
-            print err
+            pass
         except IndexError as err:
-            print err
+            pass
         except ValueError as err:
-            print err
+            pass
 
 #Pegawai
     def cekjumlahpegawai(self, mac):
@@ -152,8 +153,8 @@ class Localhost:
     def cekpegawai (self, pegawaiid, mac):
         self.cursor.execute(SQL_SYNTAX['FINDPEGAWAI'], (pegawaiid, mac,))
         try:
-
-            if self.cursor.fetchone()[0] == pegawaiid:
+            pegawai = self.cursor.fetchone()
+            if str(pegawai[0]) == str(pegawaiid):
                 return True
             else:
                 return False
@@ -206,8 +207,8 @@ class Localhost:
     def cekadmin (self, pegawaiid, mac):
         self.cursor.execute(SQL_SYNTAX['FINDADMIN'], (pegawaiid, mac,))
         try:
-
-            if self.cursor.fetchone()[0] == pegawaiid:
+            admin = self.cursor.fetchone()
+            if str(admin[0]) == str(pegawaiid):
                 return True
             else:
                 return False
@@ -236,10 +237,7 @@ class Localhost:
             if not Localhost().cekadmin(pegawaiid, mac): #Cek Pegawai Jika Sudah Ada Maka Tidak Didaftarkan
                 self.cursor.execute(SQL_SYNTAX['ADDADMIN'], (pegawaiid, nama, mac,))
                 self.cnx.commit()
-                if Localhost().cekadmin(pegawaiid, mac):
-                    return True
-                else:
-                    return False
+                return True
             else:
                 return False
 
@@ -254,9 +252,9 @@ class Localhost:
         try:
             return self.cursor.fetchone()[0]
         except TypeError as err:
-            print err
+            pass
         except IndexError as err:
-            print err
+            pass
 
     def inputdataabsensi(self, pegawaiid, mac):
         self.cursor.execute(SQL_SYNTAX['ADDATTENDANCE'], (pegawaiid, mac,))

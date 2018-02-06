@@ -33,9 +33,7 @@ class onCheck (check_Connection) :
 
     def checkAlamat(self):
         try:
-            print self.tujuan
             urllib2.urlopen(self.tujuan, timeout=self.waktuhabis)
-            print 'PING   : OK !'
             return True
         except urllib2.URLError as err:
             return False

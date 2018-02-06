@@ -79,38 +79,51 @@ def daftarpegawai(tujuan, alamat, pegawaiid, nama, mac):
         else:
             pass
     except IOError as err:
-        print err
+        pass
 
-def normalizepegawai(tujuan, alamat, mac):
-    while True:
-        data = FungsiLocal.carisemuapegawai(mac) #Mengambil array localhost
-        for pegawai in range (0, len(data)):
-            try:
-                pegawaiid = data[pegawai][0]
-            except IndexError as err:
-                print err
-            # #Cari ID ke Server
-            x = Server.load('CekPegawai',pegawaiid)
-            if len(x) is not 0 :
-                normal = FungsiLocal.normalizelocalhostpegawai(pegawaiid, mac)
-                if len(normal) > 1 :
-                    for pegawai in range (0, len(normal)):
-                        FungsiLocal.hapuspegawaiid(normal[pegawai][0], mac)
-                    while True:
-                        if Finger.cekpegawai(tujuan, alamat, pegawaiid):
-                            Finger.hapuspegawai(tujuan, alamat, pegawaiid)
-                        else:
-                            break
-                    daftarkan   = daftarpegawai(tujuan, alamat, pegawaiid, x[0]['nama'], mac)
-
+def normalizepegawai(data, dataapi, tujuan, alamat, mac):
+    #normalise fingerprint ke localhost
+    pegawaifinger = Finger.semuadatapegawai(tujuan, alamat)
+    for pegawai in pegawaifinger:
+        if str(pegawai[4].text) == str(0):
+            if FungsiLocal.cekpegawai(pegawai[6].text, mac) :
+                pass
             else:
-                while True:
-                    if not FungsiLocal.cekpegawai(pegawaiid, mac) and not Finger.cekpegawai(tujuan, alamat, pegawaiid):
-                        break
-                    else:
-                        FungsiLocal.hapuspegawai(pegawaiid, mac)
-                        Finger.hapuspegawai(tujuan, alamat, pegawaiid)
-        return
+                Finger.hapuspegawai(tujuan, alamat, pegawai[6].text)
+        else:
+            pass
+
+    #normalise localhost ke API
+    for pegawai in data:
+        status = False
+        normal = FungsiLocal.normalizelocalhostpegawai(pegawai[0], mac)
+
+        if len(normal) > 1 :
+            FungsiLocal.hapuspegawai(pegawai[0],mac)
+            while True:
+                if Finger.cekpegawai(tujuan, alamat, pegawai[0]):
+                    Finger.hapuspegawai(tujuan, alamat, pegawai[0])
+                else:
+                    break
+        else:
+            pass
+
+        for pegawaiapi in dataapi:
+            if pegawaiapi['id'] == pegawai[0] and Finger.cekpegawai(tujuan, alamat, pegawaiapi['id']):
+                status = True
+                break
+
+        if not status:
+            #hapus pegawai
+            FungsiLocal.hapuspegawai(pegawai[0],mac)
+            while True:
+                if Finger.cekpegawai(tujuan, alamat, pegawai[0]):
+                    Finger.hapuspegawai(tujuan, alamat, pegawai[0])
+                else:
+                    break
+        else:
+            pass
+    return
 
 def hapusadmin(tujuan, alamat, pegawaiid, mac):
     while True:
@@ -134,63 +147,76 @@ def daftaradmin(tujuan, alamat, adminid, nama, mac):
         else:
             pass
     except IOError as err:
-        print err
+        pass
 
-def normalizeadmin(tujuan, alamat, mac):
-    while True:
-        data = FungsiLocal.carisemuaadmin(mac) #Mengambil array localhost
-        for pegawai in range (0, len(data)):
-            try:
-                pegawaiid = data[pegawai][0]
-            except IndexError as err:
-                print err
-            #Cari ID ke Server
-            x = Server.load('CekAdmin',pegawaiid)
-            if len(x) is not 0 :
-                normal = FungsiLocal.normalizelocalhostadmin(pegawaiid, mac)
-                if len(normal) > 1 :
-                    for pegawai in range (0, len(normal)):
-                        FungsiLocal.hapusadminid(normal[pegawai][0], mac)
-
-                    while True:
-                        if Finger.cekpegawai(tujuan, alamat, pegawaiid):
-                            Finger.hapuspegawai(tujuan, alamat, pegawaiid)
-                        else:
-                            break
-                    daftarkan   = daftaradmin(tujuan, alamat, pegawaiid, x[0]['nama'], mac)
-
+def normalizeadmin(data, dataapi, tujuan, alamat, mac):
+    #normalise fingerprint ke localhost
+    pegawaifinger = Finger.semuadatapegawai(tujuan, alamat)
+    for pegawai in pegawaifinger:
+        if str(pegawai[4].text) == str(14):
+            if FungsiLocal.cekadmin(pegawai[6].text, mac) :
+                pass
             else:
-                while True:
-                    if not FungsiLocal.cekadmin(pegawaiid, mac) and not Finger.cekpegawai(tujuan, alamat, pegawaiid):
-                        break
-                    else:
-                        FungsiLocal.hapusadmin(pegawaiid, mac)
-                        Finger.hapuspegawai(tujuan, alamat, pegawaiid)
-        return
+                Finger.hapuspegawai(tujuan, alamat, pegawai[6].text)
+        else:
+            pass
+
+    #normalise localhost ke API
+    for pegawai in data:
+        status = False
+        normal = FungsiLocal.normalizelocalhostpegawai(pegawai[0], mac)
+
+        if len(normal) > 1 :
+            FungsiLocal.hapusadmin(pegawai[0],mac)
+            while True:
+                if Finger.cekpegawai(tujuan, alamat, pegawai[0]):
+                    Finger.hapuspegawai(tujuan, alamat, pegawai[0])
+                else:
+                    break
+        else:
+            pass
+
+        for pegawaiapi in dataapi:
+            if pegawaiapi['id'] == pegawai[0] and Finger.cekpegawai(tujuan, alamat, pegawaiapi['id']):
+                status = True
+                break
+
+        if not status:
+            #hapus pegawai
+            FungsiLocal.hapusadmin(pegawai[0],mac)
+            while True:
+                if Finger.cekpegawai(tujuan, alamat, pegawai[0]):
+                    Finger.hapuspegawai(tujuan, alamat, pegawai[0])
+                else:
+                    break
+        else:
+            pass
+    return
 
 def normalizemac(datalocal, dataserver):
     for listmaclocal in range(0,len(datalocal)):
         try:
             macL = datalocal[listmaclocal][0]
-            print macL
-            for listmacserver in range(0, len(dataserver)):
+            status = False
+            for listmacserver in dataserver:
                 try:
-                    macS = dataserver[listmacserver]['macaddress']
-                    print macL, macS
-                    if macL != macS :
-                        FungsiLocal.hapusmac(macL)
+                    if macL in listmacserver['macaddress']:
+                        status = macL in listmacserver['macaddress']
+                        break
                 except TypeError as err:
-                    print err
+                    pass
                 except IndexError as err:
-                    print err
+                    pass
                 except ValueError as err:
-                    print err
+                    pass
+            if not status:
+                FungsiLocal.hapusmac(macL)
         except TypeError as err:
-            print err
+            pass
         except IndexError as err:
-            print err
+            pass
         except ValueError as err:
-            print err
+            pass
 
 def daftarmac():
     DAFTARMACADDRESSSERVER  = Server.load('Macaddress',None)
@@ -205,11 +231,11 @@ def daftarmac():
                 MACADDRESS = DAFTARMACADDRESSSERVER[DAFTARMAC]['macaddress']
                 FungsiLocal.daftarmac(MACADDRESS)
             except TypeError as err:
-                print err
+                pass
             except IndexError as err:
-                print err
+                pass
             except ValueError as err:
-                print err
+                pass
 
 class Proses:
     def __init__ (self, tujuan, alamat):
@@ -220,60 +246,35 @@ class Proses:
         tujuan  = self.tujuan
         alamat  = self.alamat
         mac     = Finger.ambilmacaddress(tujuan, alamat)
-        JumlahDaftarBaru    = 0
         jumlahDihapus       = 0
         if FungsiLocal.macterdaftar(mac) :
             cetak.printLCD('Pengaturan Pegawai','Fingerprint').lcd_status()
             if Server.load('Trigger',None) is 1:
-                cetak.printLCD('Menambahkan','Pegawai').lcd_status()
-                APICEKPEGAWAI          = Server.load('Pegawai',None)
+                APICEKPEGAWAI          = Server.load('Pegawai',instansi_id.ID_INSTANSI)
+                LOCALHOSTCEKPEGAWAI     = FungsiLocal.carisemuapegawai(mac)
+                normalizepegawai(LOCALHOSTCEKPEGAWAI, APICEKPEGAWAI, tujuan, alamat, mac)
                 JUMLAHPEGAWAISERVER     = len(APICEKPEGAWAI)
                 JUMLAHPEGAWAIFINGER     = Finger.jumlahpegawai(tujuan, alamat) - FungsiLocal.cekjumlahadmin(mac)
                 JUMMLAHPEGAWAILOCAL     = FungsiLocal.cekjumlahpegawai(mac)
                 SELISIHJUMLAHPEGAWAI    = JUMLAHPEGAWAISERVER - JUMMLAHPEGAWAILOCAL
+                JumlahDaftarBaru        = 0
                 if SELISIHJUMLAHPEGAWAI > 0: #Jika Terdapat Pegawai Baru Di Server
                     #MENGAMBIL DATA ARRAY API
+                    cetak.printLCD('Menambahkan','Pegawai').lcd_status()
                     for PEGAWAI in range (0, JUMLAHPEGAWAISERVER):
                         #Mengambil ID dan NAMA pegawai
                         try:
                             ID =  APICEKPEGAWAI[PEGAWAI]['id']
                             NAMA = APICEKPEGAWAI[PEGAWAI]['nama'].replace("'"," ")
                         except ValueError as err:
-                            print err
+                            pass
                         except TypeError as err:
-                            print err
-                        #Daftarkan Pegawai
-                        try:
-                            daftarkan   = daftarpegawai(tujuan, alamat, ID, NAMA, mac)
-                            if daftarkan == 'Sukses':
-                                JumlahDaftarBaru += 1
-                            elif daftarkan == 'Finger':
-                                pass
-                            elif daftarkan == 'Localhost':
-                                pass
-                        except IOError as err:
-                            print err
-
-                elif SELISIHJUMLAHPEGAWAI < 0 : #Jika Data Di Localhost Tidak Normal
-                    cetak.printLCD('Pembaruan Data','Pegawai').lcd_status()
-                    normalizepegawai(tujuan, alamat, mac)
-                elif JUMMLAHPEGAWAILOCAL != JUMLAHPEGAWAIFINGER:
-
-                    cetak.printLCD('Pembaruan Data','Pegawai').lcd_status()
-                    for PEGAWAI in range (0, JUMLAHPEGAWAISERVER):
-                        #Mengambil ID dan NAMA pegawai
-                        try:
-                            ID =  APICEKPEGAWAI[PEGAWAI]['id']
-                            NAMA = APICEKPEGAWAI[PEGAWAI]['nama'].replace("'"," ")
-                        except ValueError as err:
-                            print err
-                        except TypeError as err:
-                            print err
+                            pass
                         #Daftarkan Pegawai
                         try:
                             daftarkan   = daftarpegawai(tujuan, alamat, ID, NAMA, mac)
                         except IOError as err:
-                            print err
+                            pass
                 else:
                     pass
 
@@ -293,9 +294,9 @@ class Proses:
                         hapuspegawai(tujuan,  alamat, ID, mac)
                         jumlahDihapus += 1
                     except ValueError as err:
-                        print err
+                        pass
                     except TypeError as err:
-                        print err
+                        pass
 
                 cetak.printLCD('%s Pegawai' % JumlahDaftarBaru,'Berhasil Dihapus').lcd_status()
 
@@ -310,17 +311,19 @@ class Proses:
         tujuan  = self.tujuan
         alamat  = self.alamat
         mac     = Finger.ambilmacaddress(tujuan, alamat)
-        JumlahDaftarBaru    = 0
         jumlahDihapus       = 0
         if FungsiLocal.macterdaftar(mac) :
             if Server.load('Trigger',None) is 1:
-                cetak.printLCD('Menambahkan','Admin').lcd_status()
                 APICEKADMIN             = Server.load('Admin',None)
+                LOCALHOSTCEKADMIN       = FungsiLocal.carisemuaadmin(mac)
+                normalizeadmin(LOCALHOSTCEKADMIN, APICEKADMIN, tujuan, alamat, mac)
                 JUMLAHADMINSERVER       = len(APICEKADMIN)
                 JUMLAHADMINFINGER       = Finger.jumlahpegawai(tujuan, alamat) - FungsiLocal.cekjumlahpegawai(mac)
                 JUMMLAHADMINLOCAL       = FungsiLocal.cekjumlahadmin(mac)
                 SELISIHJUMLAHADMIN      = JUMLAHADMINSERVER - JUMMLAHADMINLOCAL
+                JumlahDaftarBaru        = 0
                 if SELISIHJUMLAHADMIN > 0 : #Jika Terdapat ADMIN Baru Di Server
+                    cetak.printLCD('Menambahkan','Admin').lcd_status()
                     #MENGAMBIL DATA ARRAY API
                     for ADMIN in range (0, JUMLAHADMINSERVER):
                         #Mengambil ID dan NAMA ADMIN
@@ -328,41 +331,14 @@ class Proses:
                             ID =  APICEKADMIN[ADMIN]['id']
                             NAMA = APICEKADMIN[ADMIN]['nama'].replace("'"," ")
                         except ValueError as err:
-                            print err
+                            pass
                         except TypeError as err:
-                            print err
+                            pass
                         #Daftarkan ADMIN
                         try:
                             daftarkan   = daftaradmin(tujuan, alamat, ID, NAMA, mac)
-                            if daftarkan == 'Sukses':
-                                JumlahDaftarBaru += 1
-                            elif daftarkan == 'Finger':
-                                pass
-                            elif daftarkan == 'Localhost':
-                                pass
                         except IOError as err:
-                            print err
-
-                elif SELISIHJUMLAHADMIN < 0: #Jika Data Di Localhost Tidak Normal
-                    cetak.printLCD('Pembaruan Data','Admin').lcd_status()
-                    normalizeadmin(tujuan, alamat, mac)
-
-                elif JUMMLAHADMINLOCAL != JUMLAHADMINFINGER:
-                    cetak.printLCD('Pembaruan Data','Admin').lcd_status()
-                    for PEGAWAI in range (0, JUMLAHADMINSERVER):
-                        #Mengambil ID dan NAMA pegawai
-                        try:
-                            ID =  APICEKADMIN[PEGAWAI]['id']
-                            NAMA = APICEKADMIN[PEGAWAI]['nama'].replace("'"," ")
-                        except ValueError as err:
-                            print err
-                        except TypeError as err:
-                            print err
-                        #Daftarkan Pegawai
-                        try:
-                            daftarkan   = daftaradmin(tujuan, alamat, ID, NAMA, mac)
-                        except IOError as err:
-                            print err
+                            pass
                 else:
                     pass
 
@@ -382,9 +358,9 @@ class Proses:
                         hapusadmin(tujuan,  alamat, ID, mac)
                         jumlahDihapus += 1
                     except ValueError as err:
-                        print err
+                        pass
                     except TypeError as err:
-                        print err
+                        pass
                 cetak.printLCD('%s Admin' % JumlahDaftarBaru,'Berhasil Dihapus').lcd_status()
         else:
             pass
@@ -449,11 +425,11 @@ class Proses:
                             cetak.printLCD('Total Absensi','Gagal Dikirim %s' % TOTALGAGALPOST).lcd_status()
 
                     except TypeError as err:
-                        print err
+                        pass
                     except ValueError as err:
-                        print err
+                        pass
                     except IndexError as err:
-                        print err
+                        pass
             else:
                 pass
                 cetak.printLCD('Tidak Ada','Absensi Baru').lcd_status()
@@ -469,12 +445,19 @@ class Proses:
         tujuan  = self.tujuan
         alamat  = self.alamat
         mac     = Finger.ambilmacaddress(tujuan, alamat)
+        pegawaifinger = Finger.semuadatapegawai(tujuan, alamat)
+        
 
         ip                  = alamat.replace(':80','')
         versi               = FungsiLocal.ambilversion()
         jumlahmac           = FungsiLocal.cekjumlahmac()
-        jumlahpegawaifinger = Finger.jumlahpegawai(tujuan, alamat) - FungsiLocal.cekjumlahadmin(mac)
-        jumlahadminfinger   = Finger.jumlahpegawai(tujuan, alamat) - FungsiLocal.cekjumlahpegawai(mac)
+        jumlahpegawaifinger = 0
+        jumlahadminfinger   = 0
+        for pegawai in pegawaifinger:
+            if str(pegawai[4].text) == str(0):
+                jumlahpegawaifinger+=1
+            elif str(pegawai[4].text) == str(14):
+                jumlahadminfinger+=1
         jumlahabsensifinger = len(Finger.ambildataabsensi(tujuan, alamat))
         jumlahpegawailocal  = FungsiLocal.cekjumlahpegawai(mac)
         jumlahadminlocal    = FungsiLocal.cekjumlahadmin(mac)
@@ -497,7 +480,6 @@ class Proses:
                      'instansi_id'         : instansiid,
                      'token'               : encryption
                     }
-        print Server.POST('LOGRASPBERRY', headers, payload)
         if Server.POST('LOGRASPBERRY', headers, payload):
             cetak.printLCD('Berhasil Mengirim','Status Raspberry').lcd_status()
         else:
@@ -507,3 +489,4 @@ class Proses:
 # manajemenuser('Finger A', '10.10.10.10:80')
 # normalizepegawai('Finger A', '10.10.10.10:80','00:17:61:11:72:24')
 # daftarmac()
+# Proses(tujuan, alamat).manajemenadmin()

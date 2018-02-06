@@ -8,7 +8,7 @@ URL = {
 		'KEHADIRAN'           : 'http://eabsen.kalselprov.go.id/api/attendance',
 		'AMBILTEMPLATE'       : 'http://eabsen.kalselprov.go.id/api/ambilfinger/%s',
 		'TRIGGER'             : 'http://eabsen.kalselprov.go.id/api/triger',
-		'CEKPEGAWAI'          : 'http://eabsen.kalselprov.go.id/api/cekpegawai',
+		'CEKPEGAWAI'          : 'http://eabsen.kalselprov.go.id/api/cekpegawai/%s',
 		'CEKADMIN'            : 'http://eabsen.kalselprov.go.id/api/admin/finger',
 		'AMBILMAC'            : 'http://eabsen.kalselprov.go.id/api/macaddress',
 		'CEKIDPEGAWAI'        : 'http://eabsen.kalselprov.go.id/api/cekpegawaidata/%s',
@@ -21,18 +21,18 @@ URL = {
 
 #
 # URL = {
-# 		'KEHADIRAN'           : 'http://192.168.100.7/api/attendance',
-# 		'AMBILTEMPLATE'       : 'http://192.168.100.7/api/ambilfinger/%s',
-# 		'TRIGGER'             : 'http://192.168.100.7/api/triger',
-# 		'CEKPEGAWAI'          : 'http://192.168.100.7/api/cekpegawai',
-# 		'CEKADMIN'            : 'http://192.168.100.7/api/admin/finger',
-# 		'AMBILMAC'            : 'http://192.168.100.7/api/macaddress',
-# 		'CEKIDPEGAWAI'        : 'http://192.168.100.7/api/cekpegawaidata/%s',
-# 		'CEKIDADMIN'          : 'http://192.168.100.7/api/admin/finger/%s',
-#         'CEKVERSI'            : 'http://192.168.100.7/api/version',
-#         'LOGERRORUSER'        : 'http://192.168.100.7/api/logerror',
-#         'HAPUSPEGAWAI'        : 'http://192.168.100.7/api/hapusfingerpegawai',
-#         'LOGRASPBERRY'        : 'http://192.168.100.7/api/lograspberry'
+# 		'KEHADIRAN'           : 'http://192.168.113.56/api/attendance',
+# 		'AMBILTEMPLATE'       : 'http://192.168.113.56/api/ambilfinger/%s',
+# 		'TRIGGER'             : 'http://192.168.113.56/api/triger',
+# 		'CEKPEGAWAI'          : 'http://192.168.113.56/api/cekpegawai/%s',
+# 		'CEKADMIN'            : 'http://192.168.113.56/api/admin/finger',
+# 		'AMBILMAC'            : 'http://192.168.113.56/api/macaddress',
+# 		'CEKIDPEGAWAI'        : 'http://192.168.113.56/api/cekpegawaidata/%s',
+# 		'CEKIDADMIN'          : 'http://192.168.113.56/api/admin/finger/%s',
+#         'CEKVERSI'            : 'http://192.168.113.56/api/version',
+#         'LOGERRORUSER'        : 'http://192.168.113.56/api/logerror',
+#         'HAPUSPEGAWAI'        : 'http://192.168.113.56/api/hapusfingerpegawai',
+#         'LOGRASPBERRY'        : 'http://192.168.113.56/api/lograspberry'
 # }
 
 
@@ -102,18 +102,18 @@ def loadJSON(data):
         JSONloaded = json.loads(data.content)
         return JSONloaded
     except ValueError as err:
-        print err
+        pass
     except IndexError as err:
-        print err
+        pass
     except TypeError as err:
-        print err
+        pass
     except Exception as err:
-        print err
+        pass
 
 #Fungsi Cek
 def load(data, parameter):
     option = { 'Trigger'        : loadJSON(GET(URL['TRIGGER']))[0]['status'],
-               'Pegawai'        : loadJSON(GET(URL['CEKPEGAWAI'])),
+               'Pegawai'        : loadJSON(GET(URL['CEKPEGAWAI'] % parameter)),
                'Template'       : loadJSON(GET(URL['AMBILTEMPLATE'] % parameter)),
                'Admin'          : loadJSON(GET(URL['CEKADMIN'])),
                'Update'         : loadJSON(GET(URL['CEKVERSI']))['version'],
@@ -128,6 +128,5 @@ def load(data, parameter):
             hasil = option[data]
             return hasil
         except TypeError as err:
-            print err
-
+            pass
 # }
