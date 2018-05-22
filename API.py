@@ -4,7 +4,7 @@ from Send_Error import send_error
 import json
 import instansi_id
 import logging
-# import lcd_ as tampil
+import lcd_ as tampil
 
 # logging.basicConfig(filename='APIERROR.log', format='%(asctime)s %(levelname)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class METHOD:
             else :
                 return None
         except (requests.exceptions.RequestException, ValueError, TypeError)  as err:
-            # tampil.teks(text1="Server", text2=err.__class__.__name__)
+            tampil.teks(text1="Server", text2=err.__class__.__name__)
             error = {'instansi_id' : instansi_id.ID_INSTANSI, 'keterangan' : err.__class__.__name__}
             send_error(error)
             logger.error(err)
@@ -52,7 +52,7 @@ class METHOD:
             else :
                 return False
         except (requests.exceptions.RequestException, ValueError, TypeError)  as err:
-            # tampil.teks( text1="Server", text2=err.__class__.__name__)
+            tampil.teks( text1="Server", text2=err.__class__.__name__)
             error       = {'instansi_id' : instansi_id.ID_INSTANSI, 'keterangan' : err.__class__.__name__}
             send_error(error)
             logger.error(err)
@@ -105,5 +105,3 @@ class API(METHOD):
 
     def KONFIRM_GANTI_FINGER(self, payload):
         return self.POST('historyfinger', payload)
-
-logger.error(API())
