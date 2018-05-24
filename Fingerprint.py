@@ -639,8 +639,6 @@ def main_Program(IP_Address):
             elif trigger is 3:
                 if dataLocal.cekversion(version) :
                     update(version)
-                else:
-                    raise Exception
     
         else:
             tampil.teks(text1='MACADDRESS',text2='FINGERPRINT',text3='BELUM TERDAFTAR')
