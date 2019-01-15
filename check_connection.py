@@ -1,10 +1,8 @@
-import urllib2
+import os
 
-def connection_on(address):
-    try:
-        urllib2.urlopen('http://%s' % address, timeout=1)
+def connection_on(address) :
+    response = os.system("ping -c 3 " + address)
+    if response == 0:
         return True
-    except urllib2.HTTPError:
-        return False
-    except Exception:
+    else:
         return False
