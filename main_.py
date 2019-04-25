@@ -21,8 +21,8 @@ def ping_ip (ip_address) :
             list_used_ip_fp.append(alamat)
 
 if __name__ == '__main__' :
-    from new_main_program import play
-    from new_main_program import save_macaddress
+    from main_program import play
+    from main_program import save_macaddress
     import time
     
     ping_ip(ip_address)
