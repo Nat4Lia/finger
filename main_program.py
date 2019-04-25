@@ -654,7 +654,7 @@ def play(ip_address) :
         version     = 'ServerConnectionError'
     
     try :
-        if _MainProgram.is_mesin_registered() :
+        if _MainProgram.is_mesin_registered :
             _MainProgram.management_admin()
             _MainProgram.status_data()
             if trigger is 1 :
