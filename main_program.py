@@ -52,7 +52,7 @@ def update(version):
             version_table['table']['column'][0]['name'],
             version
         )
-    lcd_.teks(text1='PROGRAM RASPBERRY', text2='UPDATE', text3='KE VERSI %s' % dataLocal.ambilversion())
+    lcd_.teks(text1='PROGRAM RASPBERRY', text2='UPDATE', text3='KE VERSI %s' % RpiDatabase().get_version())
     time.sleep(1.2)
     time.sleep(5)
     lcd_.teks(text1='RASPBERRY', text2='AKAN MELAKUKAN', text3='RESTART')
@@ -85,7 +85,7 @@ def save_macaddress() :
     mac_server  = API().get_server(api['Macaddress'])
     lcd_.teks(text1='MENGAMBIL',text2='DATA',text3='MACADDRESS')
     time.sleep(1.2)
-    if mac_server is 'ServerConnectionError' :
+    if mac_server is 'ServerConnectionError' or mac_server is None :
         #tampilkan bahwa koneksi error
         lcd_.teks(text1='GAGAL',text2='MENGAMBIL',text3='DATA MACADDRESS')
         time.sleep(1.2)
