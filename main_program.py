@@ -670,10 +670,10 @@ def play(ip_address) :
                 _MainProgram.validasi_user()
             elif trigger is 3 :
                 if RpiDatabase().is_version_same(version):
-                    update(version)
-                else :
                     lcd_.teks(text1='RASPBERRY', text2='SUDAH', text3='TERUPDATE')
                     time.sleep(1.2)
+                else :
+                    update(version)
             elif trigger is 4 :
                 if RpiDatabase().is_table_zero('attendance') :
                     RpiDatabase().truncate('attendance')
