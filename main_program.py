@@ -196,53 +196,57 @@ class MainProgram(RpiDatabase, API, Mesin) :
             # iterasi absensi yang akan dikirim
                 lcd_.teks(text1='BERSIAP', text2='MENGIRIMKAN', text3='ABSENSI')
                 time.sleep(1.2)
-                for progress, attendance in enumerate(attendance_will_send) :#Kasih loading pengiriman
-                # buat otp
-                    token = encrypt(
-                        attendance['Jam'] +
-                        attendance['Tanggal'] +
-                        attendance['PIN'] +
-                        str(skpd) +
-                        attendance['Status']
-                    )
-                #
-                # kirimkan absensi
-                    _send_attendance = self.post_server(
-                        api['Absensi'], {
-                            'status'    : attendance['Status'], 
-                            'instansi'  : skpd, 
-                            'jam'       : attendance['Jam'], 
-                            'tanggal'   : attendance['Tanggal'], 
-                            'user_id'   : attendance['PIN'],
-                            'macaddress': self.mac_address,
-                            'token'     : token
-                        }
-                    )
-                #
-                    # print 'MENGIRIMKAN ABSENSI'
-                    lcd_.progress_bar(progress+1, len(attendance_will_send), text=attendance['Tanggal'])
-                    lcd_.disp.image(lcd_.image)
-                    lcd_.disp.display()
-                # jika pengiriman diterima, insert ke database
-                    if _send_attendance is 'Success' or _send_attendance is 'Failed' :
-                        self.insert_absensi(
-                            self.mac_address,
-                            attendance['Row_ID'],
-                            attendance['PIN'],
-                            attendance['Tanggal'],
-                            attendance['Jam'],
-                            attendance['Status'],
-                            _send_attendance
+                if attendance_will_send :
+                    for progress, attendance in enumerate(attendance_will_send) :#Kasih loading pengiriman
+                    # buat otp
+                        token = encrypt(
+                            attendance['Jam'] +
+                            attendance['Tanggal'] +
+                            attendance['PIN'] +
+                            str(skpd) +
+                            attendance['Status']
                         )
-                    else :
-                        lcd_.teks(text1='KONEKSI', text2='SERVER', text3='BERMASALAH')
-                        time.sleep(1.2) 
-                        lcd_.teks(text1='TIDAK DAPAT', text2='MENGIRIM ABSENSI', text3='KE SERVER')
+                    #
+                    # kirimkan absensi
+                        _send_attendance = self.post_server(
+                            api['Absensi'], {
+                                'status'    : attendance['Status'], 
+                                'instansi'  : skpd, 
+                                'jam'       : attendance['Jam'], 
+                                'tanggal'   : attendance['Tanggal'], 
+                                'user_id'   : attendance['PIN'],
+                                'macaddress': self.mac_address,
+                                'token'     : token
+                            }
+                        )
+                    #
+                        # print 'MENGIRIMKAN ABSENSI'
+                        lcd_.progress_bar(progress+1, len(attendance_will_send), text=attendance['Tanggal'])
+                        lcd_.disp.image(lcd_.image)
+                        lcd_.disp.display()
+                    # jika pengiriman diterima, insert ke database
+                        if _send_attendance is 'Success' or _send_attendance is 'Failed' :
+                            self.insert_absensi(
+                                self.mac_address,
+                                attendance['Row_ID'],
+                                attendance['PIN'],
+                                attendance['Tanggal'],
+                                attendance['Jam'],
+                                attendance['Status'],
+                                _send_attendance
+                            )
+                        else :
+                            lcd_.teks(text1='KONEKSI', text2='SERVER', text3='BERMASALAH')
+                            time.sleep(1.2) 
+                            lcd_.teks(text1='TIDAK DAPAT', text2='MENGIRIM ABSENSI', text3='KE SERVER')
+                            time.sleep(1.2)
+                            # print 'KONEKSI KE SERVER BERMASALAH'
+                            # print 'TIDAK DAPAT MENGIRIM ABSENSI KE SERVER'
                         time.sleep(1.2)
-                        # print 'KONEKSI KE SERVER BERMASALAH'
-                        # print 'TIDAK DAPAT MENGIRIM ABSENSI KE SERVER'
+                    #
+                else :
+                    lcd_.teks(text1='TIDAK ADA', text2='ABSENSI', text3='BARU')
                     time.sleep(1.2)
-                #
         #
             else :
                 lcd_.teks(text1='KESALAHAN PADA', text2='DATABASE', text3='RASPBERRY')
@@ -605,7 +609,10 @@ class MainProgram(RpiDatabase, API, Mesin) :
         if len(self.attendance) >= 50000 and self.count_attendance_sent >= 50000 :
             print 'hapus'
             self.clear_attendance()
-            clear_all_attendance()
+            RpiDatabase().truncate('attendance')
+            lcd_.teks(text1='MENGHAPUS', text2='DATA', text3='ATTENDANCE')
+            time.sleep(1.2)
+            run('sudo reboot', shell=True)
         else :
             pass
             
