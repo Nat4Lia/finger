@@ -622,21 +622,25 @@ class MainProgram(RpiDatabase, API, Mesin) :
                 if data_Mesin is None :
                     raise Exception
                 else :
-                    lcd_.teks(text1='VALIDASI', text2='USER')
-                    time.sleep(1.2)
-                    for progress, user_mesin in enumerate(data_Mesin) :
-                        hasil = False
-                        lcd_.progress_bar(progress+1, len(data_Mesin), text=user_mesin['Nama'])
-                        lcd_.disp.image(lcd_.image)
-                        lcd_.disp.display()
-                        for user_API in data_API:
-                            if str(user_mesin['PIN']) == str(user_API['pegawai_id']) :
-                                hasil = True
-                                break
-                            else :
-                                continue
-                        if not hasil :
-                            self.delete_user(user_mesin['PIN'])
+                    if len(data_API) == len(data_Mesin) :
+                        lcd_.teks(text1='USER', text2='TELAH', text3='TERVALIDASI')
+                        time.sleep(1.2)
+                    else :
+                        lcd_.teks(text1='VALIDASI', text2='USER')
+                        time.sleep(1.2)
+                        for progress, user_mesin in enumerate(data_Mesin) :
+                            hasil = False
+                            lcd_.progress_bar(progress+1, len(data_Mesin), text=user_mesin['Nama'])
+                            lcd_.disp.image(lcd_.image)
+                            lcd_.disp.display()
+                            for user_API in data_API:
+                                if str(user_mesin['PIN']) == str(user_API['pegawai_id']) :
+                                    hasil = True
+                                    break
+                                else :
+                                    continue
+                            if not hasil :
+                                self.delete_user(user_mesin['PIN'])
         except Exception as error :
             logger.error(error)
             # print error   
@@ -666,14 +670,20 @@ def play(ip_address) :
                 _MainProgram.validasi_user()
             elif trigger is 3 :
                 if RpiDatabase().is_version_same(version):
-                    print 'lakukan update'
+                    update(version)
                 else :
                     lcd_.teks(text1='RASPBERRY', text2='SUDAH', text3='TERUPDATE')
                     time.sleep(1.2)
             elif trigger is 4 :
-                clear_all_attendance()
-                lcd_.teks(text1='MENGHAPUS', text2='DATA', text3='ATTENDANCE')
-                time.sleep(1.2)
+                if RpiDatabase().is_table_zero('attendance') :
+                    RpiDatabase().truncate('attendance')
+                    lcd_.teks(text1='MENGHAPUS', text2='DATA', text3='ATTENDANCE')
+                    time.sleep(1.2)
+                    run('sudo reboot', shell=True)
+                else :
+                    lcd_.teks(text1='DATA ATTENDANCE', text2='KOSONG')
+                    time.sleep(1.2)
+
             elif trigger is 'ServerConnectionError' :
                 raise Exception
         else :

@@ -156,15 +156,33 @@ class RpiDatabase :
         )
 #
 
+# count
+    def is_table_zero (self, table) :
+        this = self.cursor
+        this.execute(
+            """
+            SELECT COUNT(id) FROM {0}
+            """.format(table)
+        )
+        count = this.fetchone()[0]
+        if count is None :
+            pass
+        elif count > 0:
+            return True
+        else:
+            return False
+#
+
 # truncate
     def truncate(self, table) :
         this = self.cursor
         this.execute(
             """
-            TRUNCATE TABLE {0}
+            DROP TABLE {0}
             """.format(table)
         )
         self.cnx.commit()
+        return
 #
 
 # insert

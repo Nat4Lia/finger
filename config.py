@@ -1,6 +1,6 @@
 from instansi_id import ID_INSTANSI
 versi_software      =   '3.0'
-server_url          =    'http://172.16.1.28'#'http://eabsen.kalselprov.go.id'
+server_url          =   'http://eabsen.kalselprov.go.id'
 skpd                =    ID_INSTANSI
 mysql_config        = {
                         'user': 'root',
