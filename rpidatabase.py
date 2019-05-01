@@ -207,10 +207,10 @@ class RpiDatabase :
             """
         )
         _get_version = this.fetchone()[0]
-        if this.fetchone() is None :
+        if _get_version is None :
             return False
         else :
-            if _get_version is version :
+            if _get_version == version :
                 return True
             else :
                 return False
@@ -348,6 +348,22 @@ class RpiDatabase :
                 """.format(mac, flag)
             )
             return this.fetchall()
+        else :
+            pass
+#
+
+# get_success_flag
+    def get_success_flag(self, mac, flag='Success') :
+        if mac is not None :
+            this = self.cursor
+            this.execute(
+                """
+                SELECT COUNT(*)
+                FROM attendance
+                WHERE mac_ = '{0}' AND flag = '{1}'
+                """.format(mac, flag)
+            )
+            return this.fetchone()[0]
         else :
             pass
 #

@@ -528,7 +528,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                     'jumlahabsensifinger'   : len(self.attendance),
                     'jumlahpegawailocal'    : len(self.user),
                     'jumlahadminlocal'      : len(self.admin),
-                    'jumlahabsensilocal'    : len(self.attendance),
+                    'jumlahabsensilocal'    : self.get_success_flag(self.mac_address),
                     'instansi_id'           : skpd,
                     'token'                 : token
                     
@@ -597,8 +597,8 @@ class MainProgram(RpiDatabase, API, Mesin) :
         except Exception as error:
             logger.error(error)
             # print error
-            lcd_.teks(text1='TERJADI KESALAHAN', text2='MANAGEMENT', text3='ADMIN')
-            time.sleep(1.2)
+            # lcd_.teks(text1='TERJADI KESALAHAN', text2='MANAGEMENT', text3='ADMIN')
+            # time.sleep(1.2)
 #
 
 #clear data 50000
