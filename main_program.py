@@ -514,7 +514,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                 str(len(self.attendance)) +
                 str(len(self.user)) +
                 str(len(self.admin)) +
-                str(len(self.attendance)) +
+                str(self.get_success_flag(self.mac_address)) +
                 str(skpd)
             )
 
