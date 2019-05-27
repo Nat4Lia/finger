@@ -661,7 +661,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
         from datetime import datetime
         if self.is_mesin_registered : #Jika Mesin Terdaftar
         #ambil jumlah absensi yg terkirim
-        #    attendance_sent = self.get_all_attendace_sent(self.mac_address)
+            attendance_sent = self.get_all_attendace_sent(self.mac_address)
         #
 
         #ambil row failed
@@ -680,13 +680,13 @@ class MainProgram(RpiDatabase, API, Mesin) :
             #mengumpulkan absensi diatas tanggal yg ditentukan
                 attendance_new = []
                 attendance_old = []
-                for data in self.attendance :
-                    tgl_khusus = datetime.strptime(tanggal, '%d-%m-%Y')
-                    tgl_fingerprint = datetime.strptime(data['Tanggal'], '%d-%m-%Y') #convert str to date
+                for row_id in range(attendance_sent, len(self.attendance)) :
+                    tgl_khusus = datetime.strptime(tanggal, '%Y-%m-%d')
+                    tgl_fingerprint = datetime.strptime(self.attendance[row_id]['Tanggal'], '%Y-%m-%d') #convert str to date
                     if tgl_fingerprint >= tgl_khusus :#jika data absensi diatas tanggal yg ditentukan
-                        attendance_new.append(data)#dikumpulkan menjadi absensi baru
+                        attendance_new.append(self.attendance[row_id])#dikumpulkan menjadi absensi baru
                     else :                         #jika tidak
-                        attendance_old.append(data)#dikumpulkan menjadi absensi lama
+                        attendance_old.append(self.attendance[row_id])#dikumpulkan menjadi absensi lama
             #
 
             #simpan absensi lama dengan status success
