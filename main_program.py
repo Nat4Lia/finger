@@ -237,6 +237,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                 time.sleep(1.2) 
                                 lcd_.teks(text1='TIDAK DAPAT', text2='MENGIRIM ABSENSI', text3='KE SERVER')
                                 time.sleep(1.2)
+                                raise Exception
                                 # print 'KONEKSI KE SERVER BERMASALAH'
                                 # print 'TIDAK DAPAT MENGIRIM ABSENSI KE SERVER'
                             time.sleep(1.2)
@@ -756,6 +757,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                 time.sleep(1.2) 
                                 lcd_.teks(text1='TIDAK DAPAT', text2='MENGIRIM ABSENSI', text3='KE SERVER')
                                 time.sleep(1.2)
+                                raise Exception
                                 # print 'KONEKSI KE SERVER BERMASALAH'
                                 # print 'TIDAK DAPAT MENGIRIM ABSENSI KE SERVER'
                             time.sleep(1.2)
