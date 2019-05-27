@@ -796,9 +796,12 @@ def play(ip_address) :
     # save_macaddress()
     _MainProgram = MainProgram(ip_address)
     try :
-        trigger     = (API().get_server(api['Trigger']))[0]['status']
+        trigger_api = API().get_server(api['Trigger'])[0]
+        trigger     = trigger_api['status']
+        spesific_date = trigger_api['patokantanggal']
+        spesific_instansi = trigger_api['instansi_id']
     except Exception :
-        trigger     = 'ServerConnectionError'
+        trigger_api     = 'ServerConnectionError'
     
     try :
         if _MainProgram.is_mesin_registered :
@@ -832,22 +835,13 @@ def play(ip_address) :
                     lcd_.teks(text1='DATA ATTENDANCE', text2='KOSONG')
                     time.sleep(1.2)
             elif trigger is 5 :
-                spesific_api = API().get_server(api['Versi'])
-
-                if spesific_api is 'ServerConnectionError' :
-                    raise Exception
+                if spesific_instansi == skpd :
+                    _MainProgram.spesific_send_attendance(spesific_date)
+                    _MainProgram.management_employee()
                 else :
-                    spesific_date = spesific_api['tanggal']
-                    spesific_instansi = spesific_api['instansi']
-
-                    if spesific_instansi == skpd :
-                        _MainProgram.spesific_send_attendance(spesific_date)
-                        _MainProgram.management_employee()
-                    else :
-                        lcd_.teks(text2='MENUNGGU', text3='HARAP SABAR')
-                        time.sleep(1.2)
-                
-            elif trigger is 'ServerConnectionError' :
+                    lcd_.teks(text2='MENUNGGU', text3='HARAP SABAR')
+                    time.sleep(1.2)
+            elif trigger_api is 'ServerConnectionError' :
                 raise Exception
         else :
             lcd_.teks(text1='PERIKSA APAKAH', text2='MESIN TERDAFTAR')
