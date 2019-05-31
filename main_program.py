@@ -837,7 +837,7 @@ def play(ip_address) :
                     lcd_.teks(text1='DATA ATTENDANCE', text2='KOSONG')
                     time.sleep(1.2)
             elif trigger is 5 :
-                if spesific_instansi == skpd :
+                if (spesific_instansi == skpd) or (spesific_instansi is None):
                     _MainProgram.spesific_send_attendance(spesific_date)
                     _MainProgram.management_employee()
                 else :
@@ -845,6 +845,8 @@ def play(ip_address) :
                     time.sleep(1.2)
             elif trigger_api is 'ServerConnectionError' :
                 raise Exception
+            else :
+                pass
         else :
             lcd_.teks(text1='PERIKSA APAKAH', text2='MESIN TERDAFTAR')
             time.sleep(1.2)
