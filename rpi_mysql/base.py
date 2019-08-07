@@ -1,41 +1,46 @@
-from config import mysql_config
-from config import attendance_table
-from config import maccaddress_table
-from config import version_table
 import mysql.connector
-import lcd_
+from collections import namedtuple
 
-#logging
-import logging
+from .const import *
+from .exception import DBErrorConnection, DBErrorResponse
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
-
-# create a file handler
-handler = logging.FileHandler('Error.log')
-handler.setLevel(logging.ERROR)
-# create a logging format
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(funcName)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-# add the handlers to the logger
-logger.addHandler(handler)
-#
+class Struct:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
 
 #Class RpiDatabase
-class RpiDatabase :
+class RpiDatabase(object):
 
-#Insisalisasi
-    def __init__ (self, config = mysql_config) :
-        self.cnx        = mysql.connector.connect(**config)
-        self.cursor     = self.cnx.cursor(buffered = True)
-        self.cnx.commit()
-        self.version_now= self.get_version()
-        self.count_mac  = self.count_macaddress()
-#
+    def __init__ (self, config = config) :
+        try:
+            self.cnx        = mysql.connector.connect(**config)
+            self.cursor     = self.cnx.cursor(buffered = True)
+            self.cnx.commit()
+        except (Exception, mysql.connector.errors.DatabaseError) as e:
+            if e.errno == 1049 :
+                x = self.is_db_exists('root', 'root', 'localhost')
+                if x :
+                    self.cnx        = mysql.connector.connect(**config)
+                    self.cursor     = self.cnx.cursor(buffered = True)
+                    self.cnx.commit()
+            else :
+                raise DBErrorConnection(str(e))
+        finally :
+            self.checking_table()
 
-# is_table_exists(tablename, dbname=database config), return True or False
-    def is_table_exists(self, tablename, dbname = mysql_config['database']) :
+    def is_db_exists(self, uname, password, db_host, dbname=config['database']) :
+        cnx        = mysql.connector.connect(user = uname, password = password, host = db_host)
+        cursor     = cnx.cursor(buffered = True)
+        this = cursor
+        this.execute(
+            """CREATE DATABASE IF NOT EXISTS {0}
+            """
+            .format(dbname)
+        )
+        cnx.close()
+        return True
+
+    def is_table_exists(self, tablename, dbname = config['database']) :
         this = self.cursor
         this.execute(
             """
@@ -51,9 +56,7 @@ class RpiDatabase :
         if this.fetchone()[0] == 1:
             return True
         return False
-#
 
-# is_column_exists (tablename, columnname), return True or False
     def is_column_exists(self, tablename, columnname) :
         this = self.cursor
         this.execute(
@@ -70,10 +73,8 @@ class RpiDatabase :
         if this.fetchone()[0] == 1:
             return True
         return False
-#
 
-# is_index_exists() : return True
-    def is_index_exists(self, tablename, indexname, dbname = mysql_config['database']) :
+    def is_index_exists(self, tablename, indexname, dbname = config['database']) :
         this = self.cursor
         this.execute(
             """
@@ -92,9 +93,7 @@ class RpiDatabase :
         if this.fetchone()[0] > 0 :
             return True
         return False
-#
 
-# create_table() : return True
     def create_table(self, table) :
         try:
             this = self.cursor
@@ -127,12 +126,9 @@ class RpiDatabase :
                 )
             return True
         except Exception as error :
-            logger.error(error)
             if str(error).find('1050') is 0:
                 return False
-#
 
-# create column
     def create_column(self, table, column, structure) :
         this = self.cursor
         this.execute(
@@ -143,9 +139,7 @@ class RpiDatabase :
                 table, column, structure
             )
         )
-#
 
-# create index
     def create_index(self, index, table, columnlist) :
         this = self.cursor
         this.execute(
@@ -154,9 +148,7 @@ class RpiDatabase :
             ON {1} ({2})
             """.format( index, table, columnlist)
         )
-#
 
-# count
     def is_table_zero (self, table) :
         this = self.cursor
         this.execute(
@@ -171,21 +163,17 @@ class RpiDatabase :
             return True
         else:
             return False
-#
 
-# truncate
     def truncate(self, table) :
         this = self.cursor
         this.execute(
             """
-            DROP TABLE {0}
+            TRUNCATE TABLE {0}
             """.format(table)
         )
         self.cnx.commit()
         return
-#
 
-# insert
     def insert (self, table, column, value) :
         this = self.cursor
         this.execute(
@@ -195,9 +183,7 @@ class RpiDatabase :
             """.format(table, column, value)
         )
         self.cnx.commit()
-#
 
-# is_version_same
     def is_version_same (self, version) :
         this = self.cursor
         this.execute(
@@ -214,9 +200,7 @@ class RpiDatabase :
                 return True
             else :
                 return False
-#
 
-# update_version
     def update_version(self, version_value) :
         this = self.cursor
         this.execute(
@@ -226,9 +210,7 @@ class RpiDatabase :
             """.format(version_value)
         )
         self.cnx.commit()
-#
 
-# get_version
     def get_version(self) :
         this = self.cursor
         this.execute(
@@ -241,9 +223,7 @@ class RpiDatabase :
             pass
         else :
             return value
-#
 
-# is_macaddress_registered
     def is_macaddress_registered (self, macaddress_value) :
         this = self.cursor
         this.execute(
@@ -257,10 +237,7 @@ class RpiDatabase :
             return True
         else :
             return False
-        
-#
 
-# delete_mac
     def delete_macaddress(self, mac) :
         this = self.cursor
         this.execute(
@@ -270,9 +247,7 @@ class RpiDatabase :
             """.format(mac)
         )
         self.cnx.commit()
-#
 
-# count_macaddress
     def count_macaddress(self) :
         this = self.cursor
         this.execute(
@@ -286,9 +261,7 @@ class RpiDatabase :
             pass
         else :
             return count
-#
 
-# get_all_mac
     def get_all_mac(self) :
         this = self.cursor
         this.execute(
@@ -299,12 +272,10 @@ class RpiDatabase :
         macaddress = this.fetchall()
         _macaddress = []
         for data in macaddress :
-            _macaddress.append(macaddress[0][0])
+            _macaddress.append(data[0])
 
         return _macaddress
-#
 
-# insert_absensi
     def insert_absensi(self, mac, row_id, user_pin, tanggal, jam, status, flag) :
         this = self.cursor
         this.execute(
@@ -334,9 +305,7 @@ class RpiDatabase :
                 """.format(mac, row_id, user_pin, tanggal, jam, status, flag)
             )
             self.cnx.commit()
-#
 
-# get_failed_flag
     def get_failed_flag(self, mac, flag='Failed') :
         if mac is not None :
             this = self.cursor
@@ -350,9 +319,7 @@ class RpiDatabase :
             return this.fetchall()
         else :
             pass
-#
 
-# get_success_flag
     def get_success_flag(self, mac, flag='Success') :
         if mac is not None :
             this = self.cursor
@@ -366,9 +333,7 @@ class RpiDatabase :
             return this.fetchone()[0]
         else :
             pass
-#
 
-# get_all
     def get_all_attendace_sent(self, mac) :
         this = self.cursor
         if mac is not None :
@@ -383,78 +348,99 @@ class RpiDatabase :
             return count
         else :
             pass
-#
 
-# delete_by_mac
     def delete_by_mac(self, macaddress) :
         this = self.cursor
         this.execute(
             """
             DELETE FROM attendance
-            WHERE mac_ = '{0}'
+            WHERE mac_ = '{}'
             """.format(macaddress)
         )
         self.cnx.commit()
-#
 
+    def i_device_info(self, device) :
+        d = namedtuple("device", device.keys())(*device.values())
+        this = self.cursor
+        try :
+            this.execute(
+                "SELECT COUNT(*) FROM device_info WHERE mac = '{}'".format(d.mac)
+            ) #is_row_exists?
 
-# RpiDatabase = RpiDatabase()
-# print RpiDatabase.get_failed_flag('AA')
+            if this.fetchone()[0] == 1 :#if exists, update
+                this.execute(
+                    """
+                    UPDATE device_info
+                    SET ip = '{}',firmware = '{}', finger_version = '{}',users = '{}',
+                        fingers = '{}',passwords = '{}',records = '{}'
+                    WHERE mac = '{}'
+                    """.format(
+                        d.ip, d.firmware, d.finger_version, d.users,
+                        d.fingers, d.passwords, d.records, d.mac
+                    )
+                )
+                self.cnx.commit()
+            else :#if new
+                this.execute(
+                    """
+                    INSERT INTO device_info(
+                        ip, mac, sn, firmware, finger_version, users, fingers, passwords,records
+                    ) VALUES ('{}','{}','{}','{}','{}','{}','{}','{}','{}')
+                    """.format(
+                        d.ip, d.mac, d.sn, d.firmware, d.finger_version,
+                        d.users, d.fingers, d.passwords, d.records
+                    )
+                )
+        except Exception as e :
+            raise DBErrorResponse(str(e))
+        finally :
+            self.cnx.commit()
 
-def checking_table(table_check = [attendance_table, maccaddress_table, version_table]) :
-    # check table
-    try :
-        import time
-        lcd_.teks(text1='CHECKING',text2='DATABASE')
-        time.sleep(1.2)
-        for index, structure in enumerate(table_check) :
-            if RpiDatabase().is_table_exists(structure['table']['name']) :
-                for column in structure['table']['column'] :
-                    if RpiDatabase().is_column_exists(
+    def checking_table(self, table_check = [attendance_table, device_info_table, maccaddress_table, version_table]) :
+        # check table
+        try :
+            import time
+            # lcd_.teks(text1='CHECKING',text2='DATABASE')
+            print 'cek database'
+            for index, structure in enumerate(table_check) :
+                if self.is_table_exists(structure['table']['name']) :
+                    for column in structure['table']['column'] :
+                        if self.is_column_exists(
+                                structure['table']['name'], 
+                                column['name']
+                        ) : 
+                            continue
+                        else: 
+                            self.create_column(
+                                structure['table']['name'],
+                                column['name'],
+                                column['structure']
+                            )   
+                    for index in structure['table']['index'] :
+                        if self.is_index_exists(
                             structure['table']['name'], 
-                            column['name']
-                    ) : 
-                        continue
-                    else: 
-                        RpiDatabase().create_column(
-                            structure['table']['name'],
-                            column['name'],
-                            column['structure']
-                        )   
-                for index in structure['table']['index'] :
-                    if RpiDatabase().is_index_exists(
-                        structure['table']['name'], 
-                        index['name']
-                    ) :
-                        continue
-                    else :
-                        column_index = ""
-                        for column in structure['table']['column'] :
-                            for indexing_column in column['index'] :
-                                if indexing_column is index['name'] :
-                                    column_index += column['name']+", " 
-                        RpiDatabase().create_index(
-                            index['name'],
-                            structure['table']['name'],
-                            column_index[:-2]
-                        )
-            else :
-                RpiDatabase().create_table(structure)
-        lcd_.teks(text1='DATABASE',text2='READY')
-        time.sleep(1.2)
-    except Exception :
-        logger.error(error)
-        lcd_.teks(text1='DATABASE',text2='NOT READY')
-        time.sleep(1.2)
-
-
-#
-# + is_table_exists (tablename): return True
-# + is_column_exists (columnname): return True
-# + is_index_exists : return True
-# + is_table_ready (table : json) : return True
-# + change_column (table : json) : return True
-# + create_table (table : json) : return True
-# + create_column (table : json) : return True
-# + create_index (table : json) : return True
-# + truncate (table) : return True
+                            index['name']
+                        ) :
+                            continue
+                        else :
+                            column_index = ""
+                            for column in structure['table']['column'] :
+                                for indexing_column in column['index'] :
+                                    if indexing_column is index['name'] :
+                                        column_index += column['name']+", " 
+                            self.create_index(
+                                index['name'],
+                                structure['table']['name'],
+                                column_index[:-2]
+                            )
+                else :
+                    self.create_table(structure)
+            # lcd_.teks(text1='DATABASE',text2='READY')
+            print 'database_ready'
+            time.sleep(1.2)
+        except Exception as error:
+            print error
+            # logger.error(error)
+            # lcd_.teks(text1='DATABASE',text2='NOT READY')
+            # time.sleep(1.2)
+            print 'database not ready'
