@@ -1,2 +1,5 @@
 #ingore instansi_id.py
 instansi_id.py
+
+#ignore file dengan ekstensi pyc
+*.pyc
