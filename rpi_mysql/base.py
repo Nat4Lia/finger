@@ -438,8 +438,7 @@ class RpiDatabase(object):
             # lcd_.teks(text1='DATABASE',text2='READY')
             print 'database_ready'
             time.sleep(1.2)
-        except Exception as error:
-            print error
+        except Exception :
             # logger.error(error)
             # lcd_.teks(text1='DATABASE',text2='NOT READY')
             # time.sleep(1.2)
