@@ -334,7 +334,7 @@ class RpiDatabase(object):
         else :
             pass
 
-    def get_all_attendace_sent(self, mac) :
+    def get_all_attendance_sent(self, mac) :
         this = self.cursor
         if mac is not None :
             this.execute(

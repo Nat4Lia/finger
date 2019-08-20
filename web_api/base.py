@@ -24,9 +24,10 @@ class API(object) :
                 r = requests.get('{}{}{}'.format(self.eabsen, api_url, params), timeout=5, headers=self.header, stream=True)
             elif request_type == self.request_post :
                 r = requests.post(self.eabsen+api_url, timeout=5, headers=self.header, json=data)
-            if r.status_code == 200 : 
-                if r.headers['Content-Type'] == 'text/html; charset=UTF-8' : return str(r.content)
-                elif r.headers['Content-Type'] == 'application/json' : return json2obj(r.content)
+            if r.status_code != 200 : 
+                raise APIErrorResponse('Server Status Code : {}'.format(r.status_code))
+            if r.headers['Content-Type'] == 'text/html; charset=UTF-8' : return str(r.content)
+            elif r.headers['Content-Type'] == 'application/json' : return json2obj(r.content)
         except Exception as e:
             raise APIErrorConnection(str(e))
 

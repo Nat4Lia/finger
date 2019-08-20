@@ -10,6 +10,8 @@ DEVICE_USED = []
 DEVICE_FOUND = 0
 DEVICE_UNREGISTERED = 0
 DEVICE_REGISTERED = 0
+DB = None
+EABSEN = None
 
 def write_device(device_list) :
     d = []
@@ -44,9 +46,10 @@ def ping(address, device_mac) :
     for ip in address :
         print 'check device {}'.format(ip)
         p = Ping(ip)
+        d = device_info(ip)
         if p.test() :
             DEVICE_FOUND += 1 
-            if device_info(ip).mac in device_mac :
+            if d.mac in device_mac :
                 DEVICE_USED.append(ip)
                 DEVICE_REGISTERED += 1
             else :
@@ -65,6 +68,12 @@ if __name__ == '__main__' :
     print '{} device found'.format(DEVICE_FOUND)
     print '{} device registered'.format(DEVICE_REGISTERED)
     print '{} device unregistered'.format(DEVICE_UNREGISTERED)
-    # if DEVICE_USED :
-    #     for device in DEVICE_USED :
-    #         print '{} device registered'.format(DEVICE_REGISTERED)
+    if DEVICE_USED :
+        import time
+        while True :
+            for device in DEVICE_USED :
+                c = Control(device, DB)
+                c.m_users()
+                c.lanjut()
+                print 'delay'
+                time.sleep(10)
