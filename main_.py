@@ -73,7 +73,7 @@ if __name__ == '__main__' :
         while True :
             for device in DEVICE_USED :
                 c = Control(device, DB)
-                c.m_users()
+                c.m_attendance()
                 c.lanjut()
                 print 'delay'
                 time.sleep(10)
