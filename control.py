@@ -4,7 +4,7 @@ from zk import ZK
 from soap import SOAP
 from token import encrypt
 
-
+import time
 
 class Control(API, ZK, SOAP):
     def __init__ (self, ip_add, db) :
@@ -20,6 +20,14 @@ class Control(API, ZK, SOAP):
                 self.device_users.append(user.user_id)
         except Exception as e :
             print ('soap.get_users Process Terminate : {}'.format(e.__class__.__name__))
+
+        try:
+            self.device_admins = []
+            for admin in self.soap.get_admins() :
+                self.device_admins.append(admin.user_id)
+        except Exception as e :
+            print ('soap.get_admins Process Terminate : {}'.format(e.__class__.__name__))
+
         try:
             self.device_attendances = self.soap.get_att()
         except Exception as e :
@@ -62,7 +70,7 @@ class Control(API, ZK, SOAP):
             except Exception as e :
                 print ('Cant get user auth : {}'.format(e.__class__.__name__))
             
-            if not s_users :
+            if user_auth is None :
                 break
 
             # """Command Daftar"""
@@ -81,7 +89,7 @@ class Control(API, ZK, SOAP):
                             self.soap.set_user(user.pegawai_id, user.nama.replace("'"," "), 0, user_auth[0].templatefinger)
                         set_status = True
                     except Exception as e :
-                            print ('daftar user failed : {}'.format(e.__class__.__name__))
+                        print ('daftar user failed : {}'.format(e.__class__.__name__))
                         
             # """Command Ganti"""
             elif user.command == 'ganti' :
@@ -123,7 +131,6 @@ class Control(API, ZK, SOAP):
                 except Exception as e :
                     print ('report queue failed : {}'.format(e.__class__.__name__))
             
-
     def m_attendance(self) :
         print 'masuk fungsi m_attendance'
         # """Penyiapan Data"""
@@ -177,9 +184,75 @@ class Control(API, ZK, SOAP):
         else :
             print ('Semua Absensi Telah Terkirim')
     
+    def m_admin(self) :
+        s_admin = None
+        list_admin = []
+        try:
+            s_admin = self.api.get_admin()
+            for admin in s_admin :
+                list_admin.append(int(admin.pegawai_id))
+        except Exception as e:
+            print ('Cant get admin from server : {}'.format(e.__class__.__name__))
+        if s_admin is None : return
+        
+        print 'server {}'.format(list_admin)
+        print 'finger {}'.format(self.device_admins)
+        # """Validasi Admin Di Finger"""
+        for admin in self.device_admins :
+            if int(admin) in list_admin :
+                continue
+            else :
+                try:
+                    self.soap.delete_user(admin)
+                except Exception as e:
+                    print 'Delete Admin Failed : {}'.format(e)
+
+        for admin in s_admin :
+            if str(admin.pegawai_id) in self.device_admins : return
+            else :
+                admin_auth = None
+                auth_type = None
+                set_status = False
+                try:
+                    admin_auth = self.api.get_auth(admin.pegawai_id)
+                    if len(admin_auth[0].templatefinger) > 8 :
+                        auth_type = 'Fingerprint'
+                    elif len(admin_auth[0].templatefinger) <= 8 :
+                        auth_type = 'Password'
+                except Exception as e:
+                    print ('Cant get admin auth : {}'.format(e.__class__.__name__))
+                
+                if admin_auth is None :
+                    break
+                
+                try:
+                    print 'mendaftarkan admin'
+                    if auth_type == 'Fingerprint' :
+                        self.soap.set_user(admin.pegawai_id, admin.nama.replace("'"," "), 14)
+                        for id, auth in enumerate(admin_auth) :
+                            self.soap.set_user_template(auth.pegawai_id, id, auth.size, auth.valid, auth.templatefinger)
+                    elif auth_type == 'Password' :
+                        self.soap.set_user(admin.pegawai_id, admin.nama.replace("'"," "), 14, admin_auth[0].templatefinger)
+                    set_status = True
+                except Exception as e:
+                    print ('daftar admin failed : {}'.format(e.__class__.__name__))
+
+                if set_status :
+                    print 'daftar admin sukses'
+
     def lanjut(self) :
         print 'fungsi lanjut'
-        # for user in s_users :
+        # conn = None
+        # try:
+        #     conn = self.zk.connect()
+        #     conn.disable_device()
+        #     conn.clear_data()
+        #     conn.enable_device()
+        # except Exception as e:
+        #     print ('clear_data Process Terminate : {}'.format(e))
+        # finally:
+        #     if conn :
+        #         conn.disconnect()
             
 
 
