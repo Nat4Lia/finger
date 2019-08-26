@@ -197,6 +197,16 @@ class Control(API, ZK, SOAP):
         
         print 'server {}'.format(list_admin)
         print 'finger {}'.format(self.device_admins)
+
+        # """Validasi Duplikat Admin Di Device, jika duplicate, semua admin dihapus"""
+        if len(set(self.device_admins)) != len(self.device_admins):
+            for admin in self.device_admins :
+                try:
+                    self.soap.delete_user(admin)
+                except Exception as e:
+                    print 'Delete Duplikat Admin Failed : {}'.format(e)
+            self.device_admins = []
+
         # """Validasi Admin Di Finger"""
         for admin in self.device_admins :
             if int(admin) in list_admin :
@@ -205,7 +215,7 @@ class Control(API, ZK, SOAP):
                 try:
                     self.soap.delete_user(admin)
                 except Exception as e:
-                    print 'Delete Admin Failed : {}'.format(e)
+                    print 'Delete Admin Tidak Terdata Failed : {}'.format(e)
 
         for admin in s_admin :
             if str(admin.pegawai_id) in self.device_admins : return
