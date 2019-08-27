@@ -326,6 +326,32 @@ class Control(API, ZK, SOAP):
                 if set_status :
                     print ('daftar admin sukses')
 
+    def status(self, version, countmac) :
+        try:
+            self.api.post_rpi_status({
+                'ip' : self.ip_add,
+                'versi' :  version,
+                'jumlahmac' : countmac,
+                'jumlahpegawaifinger' : len(self.device_users),
+                'jumlahadminfinger' : len(self.device_admins),
+                'jumlahabsensifinger' : len(self.device_attendances),
+                'jumlahpegawailocal' : len(self.device_users),
+                'jumlahadminlocal' : len(self.device_admins),
+                'jumlahabsensilocal' : self.db.get_success_flag(self.device_mac),
+                'instansi_id' : instansi,
+                'token' : encrypt(
+                    '{}{}{}{}{}{}{}{}{}{}'.format(
+                        self.ip_add, version,
+                        countmac, len(self.device_users), 
+                        len(self.device_admins), len(self.device_attendances),
+                        len(self.device_users), len(self.device_admins),
+                        self.db.get_success_flag(self.device_mac), instansi
+                    )
+                )
+            })
+        except Exception as e:
+            print ('Send status failed : {}').format(e)  
+
     def lanjut(self) :
         print ('fungsi lanjut')
         # conn = None
