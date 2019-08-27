@@ -1,3 +1,4 @@
+Version = '4.0'
 import os, json
 
 from control import Control
@@ -73,7 +74,7 @@ if __name__ == '__main__' :
         while True :
             for device in DEVICE_USED :
                 c = Control(device, DB)
-                c.m_attendance()
+                c.status(Version, len(read_device()))
                 c.lanjut()
                 print ('delay main_')
                 time.sleep(10)
