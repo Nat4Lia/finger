@@ -44,7 +44,7 @@ def ping(address, device_mac) :
     global DEVICE_FOUND
 
     for ip in address :
-        print 'check device {}'.format(ip)
+        print ('check device {}').format(ip)
         p = Ping(ip)
         d = device_info(ip)
         if p.test() :
@@ -62,18 +62,18 @@ try :
     ping(DEVICE_IPADDR_LIST, r_d)
     
 except Exception as e :
-    print 'Terminate {}'.format(e.__class__.__name__)
+    print ('Terminate {}').format(e.__class__.__name__)
 
 if __name__ == '__main__' :
-    print '{} device found'.format(DEVICE_FOUND)
-    print '{} device registered'.format(DEVICE_REGISTERED)
-    print '{} device unregistered'.format(DEVICE_UNREGISTERED)
+    print ('{} device found').format(DEVICE_FOUND)
+    print ('{} device registered').format(DEVICE_REGISTERED)
+    print ('{} device unregistered').format(DEVICE_UNREGISTERED)
     if DEVICE_USED :
         import time
         while True :
             for device in DEVICE_USED :
                 c = Control(device, DB)
-                c.m_admin()
+                c.m_attendance()
                 c.lanjut()
-                print 'delay'
+                print ('delay main_')
                 time.sleep(10)

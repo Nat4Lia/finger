@@ -14,20 +14,22 @@ class Control(API, ZK, SOAP):
         self.zk = ZK(ip_add, port=4370, timeout=5, password=0, force_udp=False, ommit_ping=False)
         self.soap = SOAP(ip_add)
         self.device_mac = self.get_dev_mac()
+
+        self.device_users = []
         try:
-            self.device_users = []
             for user in self.soap.get_users() :
                 self.device_users.append(user.user_id)
         except Exception as e :
             print ('soap.get_users Process Terminate : {}'.format(e.__class__.__name__))
-
+        
+        self.device_admins = []
         try:
-            self.device_admins = []
             for admin in self.soap.get_admins() :
                 self.device_admins.append(admin.user_id)
         except Exception as e :
             print ('soap.get_admins Process Terminate : {}'.format(e.__class__.__name__))
-
+        
+        self.device_attendances = None
         try:
             self.device_attendances = self.soap.get_att()
         except Exception as e :
@@ -48,6 +50,35 @@ class Control(API, ZK, SOAP):
                 conn.disconnect()
 
     def m_users(self) : 
+        # """Validasi User"""
+        s_user = None
+        list_user = []
+        try:
+            s_user = self.api.get_user(instansi)
+            for user in s_user :
+                list_user.append(int(user.pegawai_id))
+        except Exception as e:
+            print ('Cant get user from server : {}'.format(e.__class__.__name__))
+        if s_user is None : pass
+
+        keep_user = 0
+        remove_user = 0
+        for user in self.device_users :
+            print ('validating user : {}'.format(user))
+            if int(user) in list_user :
+                keep_user += 1
+                print ('next user')
+                continue
+            else :
+                try:
+                    self.soap.delete_user(user)
+                    remove_user +=1
+                except Exception as e:
+                    print ('Delete User Tidak Terdata Failed : {}'.format(e))
+        print ('Total User validated : {}\nKeep User : {}\nRemoved User : {}').format(
+            len(self.device_users), keep_user, remove_user)
+
+
         data_queue = {'instansi':instansi, 'macaddress':self.device_mac, 'fingerprint_ip':self.ip_add}
         s_users = None
         try :
@@ -81,7 +112,7 @@ class Control(API, ZK, SOAP):
                 else :
                     try :
                         if auth_type == 'Fingerprint' :
-                            print 'regis fp command daftar'
+                            print ('regis fp command daftar')
                             self.soap.set_user(user.pegawai_id, user.nama.replace("'"," "), 0)
                             for id, auth in enumerate(user_auth) :
                                 self.soap.set_user_template(auth.pegawai_id, id, auth.size, auth.valid, auth.templatefinger)
@@ -96,7 +127,7 @@ class Control(API, ZK, SOAP):
                 try:
                     self.soap.delete_user(user.pegawai_id)
                     if auth_type == 'Fingerprint' :
-                        print 'regis fp command ganti'
+                        print ('regis fp command ganti')
                         self.soap.set_user(user.pegawai_id, user.nama.replace("'"," "), 0)
                         for id, auth in enumerate(user_auth) :
                             self.soap.set_user_template(auth.pegawai_id, id, auth.size, auth.valid, auth.templatefinger)
@@ -111,7 +142,7 @@ class Control(API, ZK, SOAP):
                 set_status = False
                 try:
                     self.soap.delete_user(user.pegawai_id)
-                    print 'regis fp command hapus'
+                    print ('regis fp command hapus')
                     set_status = True
                 except Exception as e:
                     print ('hapus user failed : {}'.format(e.__class__.__name__))
@@ -131,59 +162,104 @@ class Control(API, ZK, SOAP):
                 except Exception as e :
                     print ('report queue failed : {}'.format(e.__class__.__name__))
             
-    def m_attendance(self) :
-        print 'masuk fungsi m_attendance'
-        # """Penyiapan Data"""
-        # """Jumlah Data Absensi Yang Terkirim"""
-        att_sent = self.db.get_all_attendance_sent(self.device_mac)
-        if att_sent is None : return
-        # """Baris Data Absensi Yang Gagal Terkirim"""
-        att_failed = self.db.get_failed_flag(self.device_mac)
-        if att_failed is None : return
-        # """Baris Data Gagal Disesuaikan Dengan Baris Data Pada Data Asli dan Kemudian Diambil Datanya"""
-        collecting_failed = []
-        for row_id in att_failed :
-            collecting_failed.append(self.device_attendances[row_id[0]])
-        # """Mengumpulkan Baris Absensi Yang Baru/Belum Terkirim"""
-        collection_new = []
-        for row_id in range(att_sent, len(self.device_attendances)) :
-            collection_new.append(self.device_attendances[row_id])
-        # """Menggabungkan Absensi Yang Gagal dengan Absensi Baru"""
-        att_will_send = collecting_failed + collection_new
+    def m_attendance(self, tanggal=None) :
+        print('m_attendance')
+        while True :
 
-        # """Iterasi Absensi Yang Dikirim"""
-        if att_will_send :
-            for att in att_will_send :
-                sending = 'Failed'
-                try:
-                    sending = self.api.post_att({
-                        'status':att.status,
-                        'instansi':instansi,
-                        'jam':att.jam,
-                        'tanggal':att.tanggal,
-                        'user_id':att.user_id,
-                        'macaddress':self.device_mac,
-                        'token':encrypt(
-                            '{}{}{}{}{}'.format(
-                                att.jam,att.tanggal,att.user_id,instansi,att.status
-                            )
-                        )
-                    })
-                    print ('Sending status {} : {}'.format(att.uid, sending))
-                except Exception as e:
-                    print ('Terminate Send : {}, status : {}'.format(e, sending))
-                finally :
+            if self.device_attendances is None : return
+            att_will_send = []
+            if tanggal is not None :
+                print ('masuk fungsi m_attendance by tanggal')
+                from datetime import datetime
+                attendance_new = []
+                s_date = datetime.strptime(tanggal, '%d-%m-%Y')
+                for att in self.device_attendances :
+                    if datetime.strptime(att.tanggal, '%d-%m-%Y') >= s_date :
+                        attendance_new.append(att)
+                att_will_send = attendance_new
+            else :
+                print ('masuk fungsi m_attendance')
+                # """Penyiapan Data"""
+                # """Jumlah Data Absensi Yang Terkirim"""
+                att_sent = self.db.get_all_attendance_sent(self.device_mac)
+                if att_sent is None : return
+                # """Baris Data Absensi Yang Gagal Terkirim"""
+                att_failed = self.db.get_failed_flag(self.device_mac)
+                if att_failed is None : return
+                # """Baris Data Gagal Disesuaikan Dengan Baris Data Pada Data Asli dan Kemudian Diambil Datanya"""
+                collecting_failed = []
+                for row_id in att_failed :
+                    collecting_failed.append(self.device_attendances[row_id[0]])
+                # """Mengumpulkan Baris Absensi Yang Baru/Belum Terkirim"""
+                collection_new = []
+                for row_id in range(att_sent, len(self.device_attendances)) :
+                    collection_new.append(self.device_attendances[row_id])
+                # """Menggabungkan Absensi Yang Gagal dengan Absensi Baru"""
+                att_will_send = collecting_failed + collection_new
+
+            # """Iterasi Absensi Yang Dikirim"""
+            if att_will_send :
+                for att in att_will_send :
+                    sending = 'Failed'
                     try:
-                        self.db.insert_absensi(
-                            self.device_mac,
-                            att.uid, att.user_id, att.tanggal,
-                            att.jam, att.status, sending
-                        )
+                        sending = self.api.post_att({
+                            'status':att.status,
+                            'instansi':instansi,
+                            'jam':att.jam,
+                            'tanggal':att.tanggal,
+                            'user_id':att.user_id,
+                            'macaddress':self.device_mac,
+                            'token':encrypt(
+                                '{}{}{}{}{}'.format(
+                                    att.jam,att.tanggal,att.user_id,instansi,att.status
+                                )
+                            )
+                        })
+                        print ('Sending status {} : {}'.format(att.uid, sending))
                     except Exception as e:
-                        print ('Terminate DB cant insert absensi : {}'.format(e))
-        else :
-            print ('Semua Absensi Telah Terkirim')
-    
+                        print ('Terminate Send : {}, status : {}'.format(e, sending))
+                    finally :
+                        try:
+                            self.db.insert_absensi(
+                                self.device_mac,
+                                att.uid, att.user_id, att.tanggal,
+                                att.jam, att.status, sending
+                            )
+                            print('Sending {}/{}/{}/{}/{}').format(
+                                att.uid, att.user_id, att.tanggal,
+                                att.jam, att.status
+                            )
+                        except Exception as e:
+                            print ('Terminate DB cant insert absensi : {}'.format(e))
+            
+            print('delay absensi for test only')
+            time.sleep(15)
+            
+            new_device_attendances = None
+            try:
+                new_device_attendances = self.soap.get_att()
+            except Exception as e :
+                print ('soap.get_att Process Terminate : {}'.format(e.__class__.__name__))
+            finally :
+                if new_device_attendances is None : return
+                if len(new_device_attendances) > len(self.device_attendances) :
+                    self.device_attendances = new_device_attendances
+                else :
+                    if len(self.device_attendances) >= 50000 :
+                        conn = None
+                        try:
+                            conn = self.zk.connect()
+                            conn.disable_device()
+                            conn.clear_attendance()
+                            conn.enable_device()
+                            self.db.truncate('attendance')
+                        except Exception as e:
+                            print ('clear_attendance Process Terminate : {}'.format(e))
+                        finally:
+                            if conn :
+                                conn.disconnect()
+                    return
+
     def m_admin(self) :
         s_admin = None
         list_admin = []
@@ -195,8 +271,8 @@ class Control(API, ZK, SOAP):
             print ('Cant get admin from server : {}'.format(e.__class__.__name__))
         if s_admin is None : return
         
-        print 'server {}'.format(list_admin)
-        print 'finger {}'.format(self.device_admins)
+        print ('server {}'.format(list_admin))
+        print ('finger {}'.format(self.device_admins))
 
         # """Validasi Duplikat Admin Di Device, jika duplicate, semua admin dihapus"""
         if len(set(self.device_admins)) != len(self.device_admins):
@@ -204,7 +280,7 @@ class Control(API, ZK, SOAP):
                 try:
                     self.soap.delete_user(admin)
                 except Exception as e:
-                    print 'Delete Duplikat Admin Failed : {}'.format(e)
+                    print ('Delete Duplikat Admin Failed : {}').format(e)
             self.device_admins = []
 
         # """Validasi Admin Di Finger"""
@@ -215,7 +291,7 @@ class Control(API, ZK, SOAP):
                 try:
                     self.soap.delete_user(admin)
                 except Exception as e:
-                    print 'Delete Admin Tidak Terdata Failed : {}'.format(e)
+                    print ('Delete Admin Tidak Terdata Failed : {}').format(e)
 
         for admin in s_admin :
             if str(admin.pegawai_id) in self.device_admins : return
@@ -236,7 +312,7 @@ class Control(API, ZK, SOAP):
                     break
                 
                 try:
-                    print 'mendaftarkan admin'
+                    print ('mendaftarkan admin')
                     if auth_type == 'Fingerprint' :
                         self.soap.set_user(admin.pegawai_id, admin.nama.replace("'"," "), 14)
                         for id, auth in enumerate(admin_auth) :
@@ -248,10 +324,10 @@ class Control(API, ZK, SOAP):
                     print ('daftar admin failed : {}'.format(e.__class__.__name__))
 
                 if set_status :
-                    print 'daftar admin sukses'
+                    print ('daftar admin sukses')
 
     def lanjut(self) :
-        print 'fungsi lanjut'
+        print ('fungsi lanjut')
         # conn = None
         # try:
         #     conn = self.zk.connect()
