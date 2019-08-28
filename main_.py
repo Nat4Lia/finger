@@ -73,8 +73,33 @@ if __name__ == '__main__' :
         import time
         while True :
             for device in DEVICE_USED :
+                command = None
+                try:
+                    command = EABSEN.get_trigger()
+                except Exception as e:
+                    print ('get_trigger failed : {}').format(e)
+                if command is None : break
                 c = Control(device, DB)
                 c.status(Version, len(read_device()))
-                c.lanjut()
+                c.m_admin()
+                c.m_users()
+                if command.status == 1 :
+                    c.m_attendance()
+                elif command.status == 2 :
+                    pass
+                elif command.status == 3 :
+                    pass
+                elif command.status == 4 :
+                    if int(command.instansi_id) == int(instansi) :
+                        if DB().is_table_zero('attendance') :
+                            DB().truncate('attendance')
+                            print ('Clear Successfull')
+                        else :
+                            print ('Attendance Localhost is Empty')
+                elif command.status == 5 :
+                    if int(command.instansi_id) == int(instansi) :
+                        c.m_attendance(command.patokantanggal)
+            
+                # c.lanjut()
                 print ('delay main_')
                 time.sleep(10)
