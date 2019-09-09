@@ -1,7 +1,7 @@
 Version = '4.0'
-import os, json
+import os, json, time
 
-from lcd_i2c import *
+from lcd_i2c import disp, image, width, height, draw, drawGauges, drawImage, drawPercentBar, drawText
 from control import Control
 from web_api import API
 from rpi_mysql import RpiDatabase
