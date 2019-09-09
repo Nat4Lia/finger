@@ -1,8 +1,8 @@
 """
 EABSEN URL
 """
-EABSEN_URL                          ='http://eabsen.test'#'http://eabsen.kalselprov.go.id'
-EABSEN_DOMAIN                       ='eabsen.test'
+EABSEN_URL                          = 'http://eabsen.kalselprov.go.id'
+EABSEN_DOMAIN                       = 'eabsen.kalselprov.go.id'
 
 """
 API URL
