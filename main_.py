@@ -1,6 +1,7 @@
 Version = '4.0'
 import os, json
 
+from lcd_i2c import *
 from control import Control
 from web_api import API
 from rpi_mysql import RpiDatabase
