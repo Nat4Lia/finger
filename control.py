@@ -252,7 +252,7 @@ class Control(API, ZK, SOAP):
                             conn.disable_device()
                             conn.clear_attendance()
                             conn.enable_device()
-                            self.db.truncate('attendance')
+                            self.db.delete_by_mac(self.device_mac)
                         except Exception as e:
                             print ('clear_attendance Process Terminate : {}'.format(e))
                         finally:
@@ -350,7 +350,7 @@ class Control(API, ZK, SOAP):
                 )
             })
         except Exception as e:
-            print ('Send status failed : {}').format(e)  
+            print ('Send status failed : {}').format(e) 
 
     def lanjut(self) :
         print ('fungsi lanjut')

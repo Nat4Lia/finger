@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from printout import disp, image, width, height, draw, drawGauges, drawImage, drawPercentBar, drawText
+from printout import tampil_teks, tampil_gambar, tampil_gauges, tampil_progressbar
 
 VERSION = (0, 9)
 

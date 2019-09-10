@@ -106,7 +106,7 @@ font = ImageFont.truetype('Retron2000.ttf',14)
 
 
 
-def drawPercentBar(max_progress, progress, text1='', text2='', text3='', x=0, y=63, width=127, height=14 ) :
+def drawPercentBar(max_progress, progress, text1, text2, text3, x=0, y=63, width=127, height=14 ) :
     text1_width, text1_height = draw.textsize(text1, font=font)
     text2_width, text2_height = draw.textsize(text2, font=font)
     text3_width, text3_height = draw.textsize(text3, font=font)
@@ -147,20 +147,19 @@ def drawPercentBar(max_progress, progress, text1='', text2='', text3='', x=0, y=
         draw.text(((width/2)+11, height-3), str('%'), font=font, fill=0)
 
 def drawGauges(value, message) :
-        g = gauges.GaugeDraw(image, 0, 100, 180)
-        message_width, message_height = draw.textsize(message, font=font)
-        print message_width, message_height
-        draw.text(((127/2)-14, 35), str('{}%'.format(value)), font=font, fill=255)
-        g.add_needle(value, needle_fill_color=255)
-        g.add_dial(major_ticks=1, minor_ticks=1, dial_format="%d")
-        g.render()
-        draw.text(((disp.width-message_width)/2, disp.height-message_height), str(message), font=font, fill=255)
+    g = gauges.GaugeDraw(image, 0, 100, 180)
+    message_width, message_height = draw.textsize(message, font=font)
+    draw.text(((127/2)-14, 35), str('{}%'.format(value)), font=font, fill=255)
+    g.add_needle(value, needle_fill_color=255)
+    g.add_dial(major_ticks=1, minor_ticks=1, dial_format="%d")
+    g.render()
+    draw.text(((disp.width-message_width)/2, disp.height-message_height), str(message), font=font, fill=255)
 
 def drawImage(image_name) :
     image = Image.open(image_name).resize((disp.width, disp.height), Image.ANTIALIAS).convert('1')
     return image
 
-def drawText(text=[]) :
+def drawText(text) :
     if text :
         draw.rectangle((0,0,width,height), outline=0, fill=0)
         if len(text) == 1:
@@ -188,4 +187,26 @@ def drawText(text=[]) :
             draw.text(((disp.width-text1_width)/2, ((disp.height-text1_height-text2_height-text3_height+10)/2)), str(text[1]), font=font, fill=255)
             draw.text(((disp.width-text0_width)/2, ((disp.height-text0_height-text1_height-text2_height-text3_height)/2)), str(text[0]), font=font, fill=255)
 
-    
+def tampil_teks(value=[]) :
+    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    drawText(value)
+    disp.image(image)
+    disp.display()
+
+def tampil_gambar(file_gambar) :
+    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    disp.image(drawImage(file_gambar))
+    disp.display()
+
+def tampil_gauges(value, message) :
+    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    drawGauges(value, message)
+    disp.image(image)
+    disp.display()
+
+def tampil_progressbar(max_progress, progress, text1='', text2='', text3='') :
+    draw.rectangle((0,0,width,height), outline=0, fill=0)
+    drawPercentBar(max_progress, progress, text1, text2, text3)
+    disp.image(image)
+    disp.display()
+
