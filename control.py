@@ -3,6 +3,7 @@ from web_api import API
 from zk import ZK
 from soap import SOAP
 from token import encrypt
+from lcd_i2c import tampil_teks, tampil_gambar, tampil_gauges, tampil_progressbar
 
 import time
 
@@ -21,19 +22,20 @@ class Control(API, ZK, SOAP):
                 self.device_users.append(user.user_id)
         except Exception as e :
             print ('soap.get_users Process Terminate : {}'.format(e.__class__.__name__))
-        
+            
         self.device_admins = []
         try:
             for admin in self.soap.get_admins() :
                 self.device_admins.append(admin.user_id)
         except Exception as e :
             print ('soap.get_admins Process Terminate : {}'.format(e.__class__.__name__))
-        
+
         self.device_attendances = None
         try:
             self.device_attendances = self.soap.get_att()
         except Exception as e :
             print ('soap.get_att Process Terminate : {}'.format(e.__class__.__name__))
+            
 
     def get_dev_mac(self) :
         conn = None
@@ -51,6 +53,8 @@ class Control(API, ZK, SOAP):
 
     def m_users(self) : 
         # """Validasi User"""
+        tampil_teks(['VALIDASI USERS'])
+        time.sleep(3)
         s_user = None
         list_user = []
         try:
@@ -59,11 +63,15 @@ class Control(API, ZK, SOAP):
                 list_user.append(int(user.pegawai_id))
         except Exception as e:
             print ('Cant get user from server : {}'.format(e.__class__.__name__))
+            tampil_teks(['SERVER', 'CONNECTION', 'ERROR'])
+            time.sleep(3)
+            tampil_teks(['CANT GET', 'USERS FROM', 'SERVER'])
+            time.sleep(3)
         if s_user is None : pass
 
         keep_user = 0
         remove_user = 0
-        for user in self.device_users :
+        for i, user in enumerate(self.device_users) :
             print ('validating user : {}'.format(user))
             if int(user) in list_user :
                 keep_user += 1
@@ -75,22 +83,36 @@ class Control(API, ZK, SOAP):
                     remove_user +=1
                 except Exception as e:
                     print ('Delete User Tidak Terdata Failed : {}'.format(e))
+                    tampil_teks(['MACHINE', str(self.ip_add), 'CONNECTION', 'ERROR'])
+                    time.sleep(3)
+                    tampil_teks(['DELETE_USER', 'FAILED', str(e)])
+                    time.sleep(3)
         print ('Total User validated : {}\nKeep User : {}\nRemoved User : {}').format(
             len(self.device_users), keep_user, remove_user)
+        tampil_teks(['TOTAL USER', 'VALIDATED', len(self.device_users)]
+        time.sleep(3)
+        tampil_teks(['KEEP : '+str(keep_user), 'REMOVED : '+str(remove_user)])
+        time.sleep(3)
 
-
+        tampil_teks(['MANAGE USERS'])
+        time.sleep(3)
         data_queue = {'instansi':instansi, 'macaddress':self.device_mac, 'fingerprint_ip':self.ip_add}
         s_users = None
         try :
             s_users = self.api.get_user_queue(data_queue)
         except Exception as e :
             print ('Cant get user queue : {}'.format(e.__class__.__name__))
+            tampil_teks(['SERVER', 'CONNECTION', 'ERROR'])
+            time.sleep(3)
+            tampil_teks(['CANT GET', 'USER QUEUE', 'FROM SERVER'])
+            time.sleep(3)
         if not s_users :
             return
         for user in s_users :
             user_auth = None
             auth_type = None
             set_status = False
+            
             # """Penyiapan Data"""
             try :
                 user_auth = self.api.get_auth(user.pegawai_id)
@@ -100,6 +122,10 @@ class Control(API, ZK, SOAP):
                     auth_type = 'Password'
             except Exception as e :
                 print ('Cant get user auth : {}'.format(e.__class__.__name__))
+                tampil_teks(['SERVER', 'CONNECTION', 'ERROR'])
+                time.sleep(3)
+                tampil_teks(['CANT GET', 'USER AUTH', 'FROM SERVER'])
+                time.sleep(3)
             
             if user_auth is None :
                 break
@@ -164,6 +190,8 @@ class Control(API, ZK, SOAP):
             
     def m_attendance(self, tanggal=None) :
         print('m_attendance')
+        tampil_teks(['PENGIRIMAN','ABSENSI'])
+        time.sleep(3)
         while True :
 
             if self.device_attendances is None : return
@@ -199,7 +227,7 @@ class Control(API, ZK, SOAP):
 
             # """Iterasi Absensi Yang Dikirim"""
             if att_will_send :
-                for att in att_will_send :
+                for i, att in enumerate(att_will_send) :
                     sending = 'Failed'
                     try:
                         sending = self.api.post_att({
@@ -219,6 +247,8 @@ class Control(API, ZK, SOAP):
                     except Exception as e:
                         print ('Terminate Send : {}, status : {}'.format(e, sending))
                     finally :
+                        tampil_progressbar(len(att_will_send), i, 'KIRIM ABSEN', str(att.tanggal), str(sending))
+                        time.sleep(2)
                         try:
                             self.db.insert_absensi(
                                 self.device_mac,
@@ -327,6 +357,7 @@ class Control(API, ZK, SOAP):
                     print ('daftar admin sukses')
 
     def status(self, version, countmac) :
+        send_status = 'Disconnected'
         try:
             self.api.post_rpi_status({
                 'ip' : self.ip_add,
@@ -349,11 +380,15 @@ class Control(API, ZK, SOAP):
                     )
                 )
             })
+            tampil_teks(['VERSI : '+str(version), 'USERS : '+str(len(self.device_users)), 'ABSENSI : '+str((len.device_attendance*100)/self.db.get_success_flag(self.device_mac))+'%', 'CONNECTED'])
+            time.sleep(3)
         except Exception as e:
+            tampil_teks(['VERSI : '+str(version), 'USERS : '+str(len(self.device_users)), 'ABSENSI : '+str((len.device_attendance*100)/self.db.get_success_flag(self.device_mac))+'%', 'DISCONNECTED'])
+            time.sleep(3)
             print ('Send status failed : {}').format(e) 
 
-    def lanjut(self) :
-        print ('fungsi lanjut')
+    # def lanjut(self) :
+    #     print ('fungsi lanjut')
         # conn = None
         # try:
         #     conn = self.zk.connect()
