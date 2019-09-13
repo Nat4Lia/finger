@@ -84,7 +84,7 @@ except Exception as e :
     print ('Terminate {}').format(e.__class__.__name__)
     tampil_teks(['ERROR', str(e.__class__.__name__)])
     time.sleep(5)
-    tampil_teks(['PROGRAM', 'EXIT')
+    tampil_teks(['PROGRAM', 'EXIT'])
     time.sleep(5)
     tampil_teks(['REBOOT TO', 'START AGAIN'])
     time.sleep(5)
