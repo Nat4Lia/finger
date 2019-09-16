@@ -141,10 +141,10 @@ def drawPercentBar(max_progress, progress, text1, text2, text3, x=0, y=63, width
         draw.text(((width/2)-11, height-3), str('{}'.format(str(r_up)[:1])), font=font, fill=0)
         draw.text(((width/2), height-3), str('{}'.format(str(r_up)[1:])), font=font, fill=0)
         draw.text(((width/2)+11, height-3), str('%'), font=font, fill=255)
-    else :
+    elif r_up >= 100 :
         draw.text(((width/2)-11, height-3), str('{}'.format(str(r_up)[:1])), font=font, fill=0)
         draw.text(((width/2), height-3), str('{}'.format(str(r_up)[1:])), font=font, fill=0)
-        draw.text(((width/2)+11, height-3), str('%'), font=font, fill=0)
+        draw.text(((width/2)+22, height-3), str('%'), font=font, fill=0)
 
 def drawGauges(value, message) :
     g = gauges.GaugeDraw(image, 0, 100, 180)
