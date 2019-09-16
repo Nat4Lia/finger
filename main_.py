@@ -60,7 +60,7 @@ try :
     # '''Tampilkan Logo'''
     tampil_gambar('logo_prov.png')
     time.sleep(3)
-    tampil_gauges(random.randint(0), 'STARTING...')
+    tampil_gauges(0, 'STARTING...')
     time.sleep(2)
     DB = RpiDatabase()
     tampil_gauges(random.randint(1, 20), 'CHECKING...')
@@ -77,7 +77,7 @@ try :
     ping(DEVICE_IPADDR_LIST, r_d)
     tampil_gauges(random.randint(81, 99), 'CHECKING...')
     time.sleep(1)
-    tampil_gauges(random.randint(100), 'READY...')
+    tampil_gauges(100, 'READY...')
     time.sleep(2)
     
 except Exception as e :
