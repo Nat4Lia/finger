@@ -109,7 +109,7 @@ if __name__ == '__main__' :
                 time.sleep(3)
                 command = None
                 try:
-                    command = EABSEN.get_trigger()
+                    command = EABSEN.get_trigger()[0]
                 except Exception as e:
                     print ('get_trigger failed : {}').format(e)
                     tampil_teks(['FAILED GET','COMMAND', 'FROM SERVER'])
