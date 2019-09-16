@@ -169,7 +169,7 @@ CONFIG
 """
 config              = {
                         'user': 'root',
-                        'password': 'root',
+                        'password': 'eabsen.kalselprov.go.id',
                         'host': 'localhost',
                         'database':'data_finger',
                         'raise_on_warnings': True,

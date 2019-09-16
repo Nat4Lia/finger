@@ -18,7 +18,7 @@ class RpiDatabase(object):
             self.cnx.commit()
         except (Exception, mysql.connector.errors.DatabaseError) as e:
             if e.errno == 1049 :
-                x = self.is_db_exists('root', 'root', 'localhost')
+                x = self.is_db_exists('root', 'eabsen.kalselprov.go.id', 'localhost')
                 if x :
                     self.cnx        = mysql.connector.connect(**config)
                     self.cursor     = self.cnx.cursor(buffered = True)
