@@ -240,7 +240,9 @@ class Control(API, ZK, SOAP):
                         print ('Terminate Send : {}, status : {}'.format(e, sending))
                     finally :
                         import datetime
-                        tampil_progressbar(len(att_will_send), i+1, 'PENGIRIMAN ABSEN', str(att.tanggal.strftime("%d %b %Y")), str(sending))
+                        tanggalsplit = att.tanggal.split('-')
+                        formattanggal = datetime.datetime(tanggalsplit[0], tanggalsplit[1], tanggalsplit[2])
+                        tampil_progressbar(len(att_will_send), i+1, 'PENGIRIMAN ABSEN', str(formattanggal.strftime("%d %b %Y")), str(sending))
                         time.sleep(2)
                         try:
                             self.db.insert_absensi(
