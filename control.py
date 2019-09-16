@@ -53,8 +53,6 @@ class Control(API, ZK, SOAP):
 
     def m_users(self) : 
         # """Validasi User"""
-        tampil_teks(['VALIDASI USERS'])
-        time.sleep(3)
         s_user = None
         list_user = []
         try:
@@ -63,10 +61,6 @@ class Control(API, ZK, SOAP):
                 list_user.append(int(user.pegawai_id))
         except Exception as e:
             print ('Cant get user from server : {}'.format(e.__class__.__name__))
-            tampil_teks(['SERVER', 'CONNECTION', 'ERROR'])
-            time.sleep(3)
-            tampil_teks(['CANT GET', 'USERS FROM', 'SERVER'])
-            time.sleep(3)
         if s_user is None : pass
 
         keep_user = 0
@@ -83,19 +77,9 @@ class Control(API, ZK, SOAP):
                     remove_user +=1
                 except Exception as e:
                     print ('Delete User Tidak Terdata Failed : {}'.format(e))
-                    tampil_teks(['MACHINE', str(self.ip_add), 'CONNECTION', 'ERROR'])
-                    time.sleep(3)
-                    tampil_teks(['DELETE_USER', 'FAILED', str(e)])
-                    time.sleep(3)
         print ('Total User validated : {}\nKeep User : {}\nRemoved User : {}').format(
             len(self.device_users), keep_user, remove_user)
-        tampil_teks(['TOTAL USER', 'VALIDATED', len(self.device_users)]
-        time.sleep(3)
-        tampil_teks(['KEEP : '+str(keep_user), 'REMOVED : '+str(remove_user)])
-        time.sleep(3)
 
-        tampil_teks(['MANAGE USERS'])
-        time.sleep(3)
         data_queue = {'instansi':instansi, 'macaddress':self.device_mac, 'fingerprint_ip':self.ip_add}
         s_users = None
         try :
@@ -108,6 +92,8 @@ class Control(API, ZK, SOAP):
             time.sleep(3)
         if not s_users :
             return
+        tampil_teks(['MANAGE USERS'])
+        time.sleep(3)
         for user in s_users :
             user_auth = None
             auth_type = None
@@ -145,6 +131,8 @@ class Control(API, ZK, SOAP):
                         elif auth_type == 'Password' :
                             self.soap.set_user(user.pegawai_id, user.nama.replace("'"," "), 0, user_auth[0].templatefinger)
                         set_status = True
+                        tampil_teks(['MENDAFTARKAN', user.nama, auth_type])
+                        time.sleep(3)
                     except Exception as e :
                         print ('daftar user failed : {}'.format(e.__class__.__name__))
                         
@@ -160,6 +148,8 @@ class Control(API, ZK, SOAP):
                     elif auth_type == 'Password' :
                         self.soap.set_user(user.pegawai_id, user.nama.replace("'"," "), 0, user_auth[0].templatefinger)
                     set_status = True
+                    tampil_teks(['GANTI', auth_type, user.nama])
+                    time.sleep(3)
                 except Exception as e:
                     print ('ganti user failed : {}'.format(e.__class__.__name__))
             
@@ -170,6 +160,8 @@ class Control(API, ZK, SOAP):
                     self.soap.delete_user(user.pegawai_id)
                     print ('regis fp command hapus')
                     set_status = True
+                    tampil_teks(['HAPUS USER', user.nama])
+                    time.sleep(3)
                 except Exception as e:
                     print ('hapus user failed : {}'.format(e.__class__.__name__))
             
@@ -247,7 +239,8 @@ class Control(API, ZK, SOAP):
                     except Exception as e:
                         print ('Terminate Send : {}, status : {}'.format(e, sending))
                     finally :
-                        tampil_progressbar(len(att_will_send), i, 'KIRIM ABSEN', str(att.tanggal), str(sending))
+                        import datetime
+                        tampil_progressbar(len(att_will_send), i+1, 'PENGIRIMAN ABSEN', str(att.tanggal.strftime("%d %b %Y")), str(sending))
                         time.sleep(2)
                         try:
                             self.db.insert_absensi(
@@ -358,6 +351,7 @@ class Control(API, ZK, SOAP):
 
     def status(self, version, countmac) :
         send_status = 'Disconnected'
+        precentabsen = 0
         try:
             self.api.post_rpi_status({
                 'ip' : self.ip_add,
@@ -380,10 +374,14 @@ class Control(API, ZK, SOAP):
                     )
                 )
             })
-            tampil_teks(['VERSI : '+str(version), 'USERS : '+str(len(self.device_users)), 'ABSENSI : '+str((len.device_attendance*100)/self.db.get_success_flag(self.device_mac))+'%', 'CONNECTED'])
+            try : 
+                percentabsen = float(len(self.device_attendances)) / float(self.db.get_success_flag(self.device_mac)) * 100
+            except ZeroDivisionError :
+                percentabsen = 0
+            tampil_teks(['VERSI : '+str(version), 'PEGAWAI : '+str(len(self.device_users)), 'ABSENSI : '+str(int(percentabsen))+'%', 'CONNECTED'])
             time.sleep(3)
         except Exception as e:
-            tampil_teks(['VERSI : '+str(version), 'USERS : '+str(len(self.device_users)), 'ABSENSI : '+str((len.device_attendance*100)/self.db.get_success_flag(self.device_mac))+'%', 'DISCONNECTED'])
+            tampil_teks(['VERSI : '+str(version), 'PEGAWAI : '+str(len(self.device_users)), 'ABSENSI : '+str(int(percentabsen))+'%', 'DISCONNECTED'])
             time.sleep(3)
             print ('Send status failed : {}').format(e) 
 
