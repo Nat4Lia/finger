@@ -246,7 +246,8 @@ class Control(API, ZK, SOAP):
                         uname = None
                         if self.device_fusers :
                             for user in self.device_fusers :
-                                uname = user.nama
+                                if att.user_id == user.user_id :
+                                    uname = user.name
                         formattanggal = datetime.datetime(int(tanggalsplit[0]), int(tanggalsplit[1]), int(tanggalsplit[2]))
                         tampil_progressbar(len(att_will_send), i+1, str(sending), str(formattanggal.strftime("%d %b %Y")), str(uname))
                         time.sleep(2)
