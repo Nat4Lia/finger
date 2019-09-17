@@ -71,25 +71,27 @@ class Control(API, ZK, SOAP):
                 list_user.append(int(user.pegawai_id))
         except Exception as e:
             print ('Cant get user from server : {}'.format(e.__class__.__name__))
-        if s_user is None : pass
+        if s_user is None or not self.device_users : pass
+        else :
+            keep_user = 0
+            remove_user = 0
+            for i, user in enumerate(self.device_users) :
+                print ('validating user : {}'.format(user))
+                if int(user) in list_user :
+                    keep_user += 1
+                    print ('next user')
+                    continue
+                else :
+                    try:
+                        self.soap.delete_user(user)
+                        remove_user +=1
+                    except Exception as e:
+                        print ('Delete User Tidak Terdata Failed : {}'.format(e))
+            print ('Total User validated : {}\nKeep User : {}\nRemoved User : {}').format(
+                len(self.device_users), keep_user, remove_user)
 
-        keep_user = 0
-        remove_user = 0
-        for i, user in enumerate(self.device_users) :
-            print ('validating user : {}'.format(user))
-            if int(user) in list_user :
-                keep_user += 1
-                print ('next user')
-                continue
-            else :
-                try:
-                    self.soap.delete_user(user)
-                    remove_user +=1
-                except Exception as e:
-                    print ('Delete User Tidak Terdata Failed : {}'.format(e))
-        print ('Total User validated : {}\nKeep User : {}\nRemoved User : {}').format(
-            len(self.device_users), keep_user, remove_user)
-
+        # """Queue User"""
+        print 'Queue User'
         data_queue = {'instansi':instansi, 'macaddress':self.device_mac, 'fingerprint_ip':self.ip_add}
         s_users = None
         try :
