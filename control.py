@@ -239,10 +239,11 @@ class Control(API, ZK, SOAP):
                     except Exception as e:
                         print ('Terminate Send : {}, status : {}'.format(e, sending))
                     finally :
-                        import datetime
+                        import datetime, locale
+                        locale.setlocale(locale.LC_TIME, "id_ID")
                         tanggalsplit = att.tanggal.split('-')
                         formattanggal = datetime.datetime(int(tanggalsplit[0]), int(tanggalsplit[1]), int(tanggalsplit[2]))
-                        tampil_progressbar(len(att_will_send), i+1, 'Pengiriman Absen', str(formattanggal.strftime("%d %b %Y")), str(sending))
+                        tampil_progressbar(len(att_will_send), i+1, 'Kirim Absen', str(formattanggal.strftime("%d %b %Y")), str(sending))
                         time.sleep(2)
                         try:
                             self.db.insert_absensi(
