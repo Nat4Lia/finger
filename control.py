@@ -43,6 +43,7 @@ class Control(API, ZK, SOAP):
             print ('soap.get_att Process Terminate : {}'.format(e.__class__.__name__))
             tampil_teks(['Koneksi', 'Fingerprint', 'Terputus'])
             time.sleep(2)
+            return
             
 
     def get_dev_mac(self) :
@@ -143,6 +144,7 @@ class Control(API, ZK, SOAP):
                         elif auth_type == 'Password' :
                             self.soap.set_user(user.pegawai_id, user.nama.replace("'"," "), 0, user_auth[0].templatefinger)
                         set_status = True
+                        self.device_users.append(user.pegawai_id)
                         tampil_teks(['MENDAFTARKAN', user.nama, auth_type])
                         time.sleep(3)
                     except Exception as e :

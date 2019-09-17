@@ -100,6 +100,14 @@ if __name__ == '__main__' :
     time.sleep(3)
     tampil_teks(['MESIN TIDAK', 'TERDAFTAR', str(DEVICE_UNREGISTERED)])
     time.sleep(3)
+    if DEVICE_FOUND == 0 :
+        tampil_teks(['TIDAK ADA', 'FINGERPRINT'])
+        time.sleep(5)
+        tampil_teks(['PROGRAM', 'EXIT'])
+        time.sleep(5)
+        tampil_teks(['REBOOT TO', 'START AGAIN'])
+        time.sleep(5)
+        sys.exit()
     
     if DEVICE_USED :
         import time
@@ -116,7 +124,6 @@ if __name__ == '__main__' :
                     time.sleep(3)
                 if command is None : break
                 c = Control(device, DB)
-                c.status(Version, len(read_device()))
                 c.m_admin()
                 c.m_users()
                 if command.status == 1 :
@@ -143,7 +150,8 @@ if __name__ == '__main__' :
                         print ('Pengiriman Absensi Ditunda')
                         tampil_teks(['PENGIRIMAN','ABSENSI', 'DITUNDA'])
                         time.sleep(3)
-            
+                
+                c.status(Version, len(read_device()))
                 # c.lanjut()
                 print ('delay main_')
                 time.sleep(10)
