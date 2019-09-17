@@ -17,8 +17,10 @@ class Control(API, ZK, SOAP):
         self.device_mac = self.get_dev_mac()
 
         self.device_users = []
+        self.device_fusers = None
         try:
-            for user in self.soap.get_users() :
+            self.device_fusers = self.soap.get_users()
+            for user in self.device_fusers :
                 self.device_users.append(user.user_id)
         except Exception as e :
             print ('soap.get_users Process Terminate : {}'.format(e.__class__.__name__))
@@ -242,8 +244,12 @@ class Control(API, ZK, SOAP):
                         import datetime, locale
                         locale.setlocale(locale.LC_TIME, "id_ID")
                         tanggalsplit = att.tanggal.split('-')
+                        uname = None
+                        if self.device_fusers :
+                            for user in self.device_fusers :
+                                uname = user.nama
                         formattanggal = datetime.datetime(int(tanggalsplit[0]), int(tanggalsplit[1]), int(tanggalsplit[2]))
-                        tampil_progressbar(len(att_will_send), i+1, 'Kirim Absen', str(formattanggal.strftime("%d %b %Y")), str(sending))
+                        tampil_progressbar(len(att_will_send), i+1, str(sending), str(formattanggal.strftime("%d %b %Y")), str(uname))
                         time.sleep(2)
                         try:
                             self.db.insert_absensi(
