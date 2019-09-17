@@ -24,7 +24,7 @@ class Control(API, ZK, SOAP):
                 self.device_users.append(user.user_id)
         except Exception as e :
             print ('soap.get_users Process Terminate : {}'.format(e.__class__.__name__))
-            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            tampil_teks(['Koneksi', 'Fingerprint', 'Terputus'])
             time.sleep(2)
             
         self.device_admins = []
@@ -33,7 +33,7 @@ class Control(API, ZK, SOAP):
                 self.device_admins.append(admin.user_id)
         except Exception as e :
             print ('soap.get_admins Process Terminate : {}'.format(e.__class__.__name__))
-            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            tampil_teks(['Koneksi', 'Fingerprint', 'Terputus'])
             time.sleep(2)
 
         self.device_attendances = None
@@ -41,7 +41,7 @@ class Control(API, ZK, SOAP):
             self.device_attendances = self.soap.get_att()
         except Exception as e :
             print ('soap.get_att Process Terminate : {}'.format(e.__class__.__name__))
-            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            tampil_teks(['Koneksi', 'Fingerprint', 'Terputus'])
             time.sleep(2)
             
 
@@ -55,7 +55,7 @@ class Control(API, ZK, SOAP):
             return device_mac
         except Exception as e:
             print ('get_dev_mac Process Terminate : {}'.format(e))
-            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            tampil_teks(['Koneksi', 'Fingerprint', 'Terputus'])
             time.sleep(2)
         finally:
             if conn :
@@ -376,7 +376,7 @@ class Control(API, ZK, SOAP):
 
     def status(self, version, countmac) :
         send_status = 'Disconnected'
-        precentabsen = 0
+        percentabsen = 0
         try:
             self.api.post_rpi_status({
                 'ip' : self.ip_add,
