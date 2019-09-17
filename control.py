@@ -24,6 +24,8 @@ class Control(API, ZK, SOAP):
                 self.device_users.append(user.user_id)
         except Exception as e :
             print ('soap.get_users Process Terminate : {}'.format(e.__class__.__name__))
+            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            time.sleep(2)
             
         self.device_admins = []
         try:
@@ -31,12 +33,16 @@ class Control(API, ZK, SOAP):
                 self.device_admins.append(admin.user_id)
         except Exception as e :
             print ('soap.get_admins Process Terminate : {}'.format(e.__class__.__name__))
+            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            time.sleep(2)
 
         self.device_attendances = None
         try:
             self.device_attendances = self.soap.get_att()
         except Exception as e :
             print ('soap.get_att Process Terminate : {}'.format(e.__class__.__name__))
+            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            time.sleep(2)
             
 
     def get_dev_mac(self) :
@@ -49,6 +55,8 @@ class Control(API, ZK, SOAP):
             return device_mac
         except Exception as e:
             print ('get_dev_mac Process Terminate : {}'.format(e))
+            tampil_teks(['Konesi', 'Fingerprint', 'Terputus'])
+            time.sleep(2)
         finally:
             if conn :
                 conn.disconnect()
@@ -244,12 +252,20 @@ class Control(API, ZK, SOAP):
                         import datetime
                         tanggalsplit = att.tanggal.split('-')
                         uname = None
-                        if self.device_fusers :
+                        attstatus = None
+                        if att.status == '0' :
+                            attstatus = 'Masuk'
+                        elif att.status == '1' :
+                            attstatus = 'Pulang'
+                        print ('fusers : {}').format(self.device_fusers)
+                        if self.device_fusers is not None:
                             for user in self.device_fusers :
-                                if att.user_id == user.user_id :
-                                    uname = user.name
+                                print ('attuserid : {}').format(att.user_id)
+                                print ('useruser_id : {}').format(user.user_id)
+                                if int(att.user_id) == int(user.user_id) :
+                                    uname = user.nama
                         formattanggal = datetime.datetime(int(tanggalsplit[0]), int(tanggalsplit[1]), int(tanggalsplit[2]))
-                        tampil_progressbar(len(att_will_send), i+1, str(sending), str(formattanggal.strftime("%d %b %Y")), str(uname))
+                        tampil_progressbar(len(att_will_send), i+1, str(attstatus), str(formattanggal.strftime("%d %b %Y")), str(uname))
                         time.sleep(2)
                         try:
                             self.db.insert_absensi(
@@ -384,7 +400,7 @@ class Control(API, ZK, SOAP):
                 )
             })
             try : 
-                percentabsen = float(len(self.device_attendances)) / float(self.db.get_success_flag(self.device_mac)) * 100
+                percentabsen =  float(self.db.get_success_flag(self.device_mac)) / float(len(self.device_attendances)) * 100
             except ZeroDivisionError :
                 percentabsen = 0
             tampil_teks(['VERSI : '+str(version), 'PEGAWAI : '+str(len(self.device_users)), 'ABSENSI : '+str(int(percentabsen))+'%', 'CONNECTED'])
