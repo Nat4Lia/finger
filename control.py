@@ -241,8 +241,7 @@ class Control(API, ZK, SOAP):
                     except Exception as e:
                         print ('Terminate Send : {}, status : {}'.format(e, sending))
                     finally :
-                        import datetime, locale
-                        locale.setlocale(locale.LC_TIME, "id_ID")
+                        import datetime
                         tanggalsplit = att.tanggal.split('-')
                         uname = None
                         if self.device_fusers :
