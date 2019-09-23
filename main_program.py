@@ -27,37 +27,37 @@ logger.addHandler(handler)
 #
 
 # update program
-def update(version):
-    SRC = '/home/pi/finger'
-    CMD = {
-            'REMOVESOURCE'  : 'sudo rm -rf %s',
-            'CLONETOSOURCE' : 'sudo git clone https://github.com/Nat4Lia/finger.git %s',
-            'COPYTOETC'     : 'sudo cp -R /home/pi/finger /etc/',
-            'REBOOT'        : 'sudo reboot'
-    }
+# def update(version):
+#     SRC = '/home/pi/finger'
+#     CMD = {
+#             'REMOVESOURCE'  : 'sudo rm -rf %s',
+#             'CLONETOSOURCE' : 'sudo git clone https://github.com/Nat4Lia/finger.git %s',
+#             'COPYTOETC'     : 'sudo cp -R /home/pi/finger /etc/',
+#             'REBOOT'        : 'sudo reboot'
+#     }
 
-    lcd_.teks(text1='UPDATE PROGRAM', text2='RASPBERRY')
-    time.sleep(1.2)
-    if os.path.isdir(SRC) :
-        run(CMD['REMOVESOURCE'] % SRC,shell=True)
-        run(CMD['CLONETOSOURCE'] % SRC,shell=True)
-        run(CMD['COPYTOETC'], shell=True)
-        RpiDatabase().update_version(version)
-    else :
-        run(CMD['CLONETOSOURCE'] % SRC,shell=True)
-        run(CMD['COPYTOETC'], shell=True)
-        from config import version_table
-        RpiDatabase().insert(
-            version_table['table']['name'],
-            version_table['table']['column'][0]['name'],
-            version
-        )
-    lcd_.teks(text1='PROGRAM RASPBERRY', text2='UPDATE', text3='KE VERSI %s' % RpiDatabase().get_version())
-    time.sleep(1.2)
-    time.sleep(5)
-    lcd_.teks(text1='RASPBERRY', text2='AKAN MELAKUKAN', text3='RESTART')
-    time.sleep(1.2)
-    run(CMD['REBOOT'], shell=True)
+#     lcd_.teks(text1='UPDATE PROGRAM', text2='RASPBERRY')
+#     time.sleep(1.2)
+#     if os.path.isdir(SRC) :
+#         run(CMD['REMOVESOURCE'] % SRC,shell=True)
+#         run(CMD['CLONETOSOURCE'] % SRC,shell=True)
+#         run(CMD['COPYTOETC'], shell=True)
+#         RpiDatabase().update_version(version)
+#     else :
+#         run(CMD['CLONETOSOURCE'] % SRC,shell=True)
+#         run(CMD['COPYTOETC'], shell=True)
+#         from config import version_table
+#         RpiDatabase().insert(
+#             version_table['table']['name'],
+#             version_table['table']['column'][0]['name'],
+#             version
+#         )
+#     lcd_.teks(text1='PROGRAM RASPBERRY', text2='UPDATE', text3='KE VERSI %s' % RpiDatabase().get_version())
+#     time.sleep(1.2)
+#     time.sleep(5)
+#     lcd_.teks(text1='RASPBERRY', text2='AKAN MELAKUKAN', text3='RESTART')
+#     time.sleep(1.2)
+#     run(CMD['REBOOT'], shell=True)
 #
 
 # check_connection
