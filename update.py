@@ -37,6 +37,7 @@ def try_update() :
                 os.system(command['rmexcept'])
                 os.system(command['unzipfile'].format(src, new_version, new_version, dst))
                 os.system(command['removezip'].format(src, new_version))
+                teks('REBOOT...')
                 os.system(command['reboot'])
         else :
             teks('TIDAK ADA','UPDATE')
