@@ -1,6 +1,6 @@
 import os
 from subprocess import check_call as run
-import requests
+import requests, time
 from lcd_ import teks
 
 Version = '3.1.0'
@@ -37,8 +37,10 @@ def try_update() :
                 os.system(command['rmexcept'])
                 os.system(command['unzipfile'].format(src, new_version, new_version, dst))
                 os.system(command['removezip'].format(src, new_version))
+                os.system(command['reboot'])
         else :
             teks('TIDAK ADA','UPDATE')
+            time.sleep(2)
     except Exception as e :
         print ('Update Error : {}').format(e)
         teks('UPDATE', 'GAGAL')
