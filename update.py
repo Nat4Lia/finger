@@ -3,7 +3,7 @@ from subprocess import check_call as run
 import requests
 from lcd_ import teks
 
-Version = '3.1'
+Version = '3.1.0'
 src = '/home/pi/finger'
 dst = '/etc/finger'
 command = {

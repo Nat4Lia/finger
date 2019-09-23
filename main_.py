@@ -29,6 +29,7 @@ if __name__ == '__main__' :
     ping_ip(ip_address)
     save_macaddress()
     checking_table()
+    try_update()
     if not list_used_ip_fp :
         lcd_.teks(text1='TIDAK ADA',text2='FINGERPRINT',text3='YANG TERHUBUNG')
         time.sleep(1.2)
