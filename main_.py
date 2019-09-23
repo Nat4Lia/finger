@@ -3,6 +3,7 @@ import lcd_
 from rpidatabase import RpiDatabase
 from rpidatabase import checking_table
 from update import try_update
+
 def check_ip_config () :
     try :
         from instansi_id import ipaddress as ip
@@ -14,8 +15,9 @@ def check_ip_config () :
 ip_address = check_ip_config()
 from config import list_used_ip_fp
 def ping_ip (ip_address) :
+    from config import versi_software
     for i, alamat in enumerate(ip_address) :
-        lcd_.progress_bar(i+1, len(ip_address), text='%s' % RpiDatabase().get_version())
+        lcd_.progress_bar(i+1, len(ip_address), text=str(versi_software))
         lcd_.disp.image(lcd_.image)
         lcd_.disp.display()
         if connection_on(alamat) :

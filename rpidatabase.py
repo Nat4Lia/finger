@@ -442,7 +442,7 @@ def checking_table(table_check = [attendance_table, maccaddress_table, version_t
                 RpiDatabase().create_table(structure)
         lcd_.teks(text1='DATABASE',text2='READY')
         time.sleep(1.2)
-    except Exception :
+    except Exception as error:
         logger.error(error)
         lcd_.teks(text1='DATABASE',text2='NOT READY')
         time.sleep(1.2)
