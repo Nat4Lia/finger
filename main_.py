@@ -7,6 +7,7 @@ from web_api import API
 from rpi_mysql import RpiDatabase
 from instansi_id import ID_INSTANSI as instansi
 from config import DEVICE_IPADDR_LIST
+from update import try_update
 
 DEVICE_USED = []
 DEVICE_FOUND = 0
@@ -112,6 +113,7 @@ if __name__ == '__main__' :
     if DEVICE_USED :
         import time
         while True :
+            try_update()
             for device in DEVICE_USED :
                 tampil_teks(['CONNECTING', 'TO...', str(device)])
                 time.sleep(3)

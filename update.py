@@ -1,6 +1,7 @@
 import os
 from subprocess import check_call as run
 import requests
+from lcd_i2c import tampil_teks
 
 Version = '4.0'
 src = '/home/pi/finger'
@@ -17,16 +18,26 @@ command = {
     'removezip'     : 'sudo rm -rf {}/v{}.zip'    
 }
 
-r = requests.get('https://github.com/Nat4Lia/finger/releases/latest')
-new_version = r.url[len(r.url)-5:]
-if version != new_version :
-    run(command['removesrc'].format(src), shell=True)
-    run(command['getzipfile'].format(src, new_version, dst), shell=True)
-    if not os.path.isdir(dst):
-        os.system(command['unzipfile'].format(src, new_version, dst))
-    else :
-        os.chdir(dst)
-        os.system(command['enextglob'])
-        os.system(command['rmallex'])
-        os.system(command['unzipfile'].format(src, new_version, new_version, dst))
-        os.system(command['removezip'].format(src, new_version))
+def try_update():
+    try :
+        tampil_teks(['CEK', 'UPDATE')
+        r = requests.get('https://github.com/Nat4Lia/finger/releases/latest', timeout=5)
+        new_version = r.url[len(r.url)-5:]
+        if Version != new_version :
+            tampil_teks(['UPDATE', 'KE VERSI', str(new_version)])
+            run(command['removesrc'].format(src), shell=True)
+            run(command['getzipfile'].format(src, new_version, dst), shell=True)
+            if not os.path.isdir(dst):
+                os.system(command['unzipfile'].format(src, new_version, dst))
+                tampil_teks(['UPDATE', 'BERHASIL'])
+            else :
+                os.chdir(dst)
+                os.system(command['rmallex'])
+                os.system(command['unzipfile'].format(src, new_version, new_version, dst))
+                os.system(command['removezip'].format(src, new_version))
+                tampil_teks(['UPDATE', 'BERHASIL'])
+        else :
+            tampil_teks(['TIDAK ADA', 'UPDATE'])
+    except Exception as e :
+        print ('Update Error : {}').format(e)
+        tampil_teks(['UPDATE', 'GAGAL'])
