@@ -2,7 +2,7 @@ from mesin import Mesin
 from rpidatabase import RpiDatabase
 import os
 from api import API
-from config import server_api_param as api
+from config import server_api_param as api, versi_software
 from subprocess import check_call as run
 import time
 from config import skpd
@@ -510,7 +510,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
         try :
             token = encrypt(
                 str(self.ip_addr) +
-                str(self.get_version()) +
+                str(versi_software) +
                 str(self.count_mac) +
                 str(len(self.user)) +
                 str(len(self.admin)) +
@@ -524,7 +524,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
             _send_status = self.post_server(
                 api['Status'], {
                     'ip'                    : self.ip_addr,
-                    'versi'                 : self.get_version(),
+                    'versi'                 : versi_software,
                     'jumlahmac'             : self.count_mac,
                     'jumlahpegawaifinger'   : len(self.user),
                     'jumlahadminfinger'     : len(self.admin),
@@ -541,7 +541,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                 tulisan = 'CONNECTED'
             else :
                 tulisan = 'DISCONNECTED'
-            lcd_.teks(text1='VERSI : %s' % self.get_version(), 
+            lcd_.teks(text1='VERSI : %s' % versi_software, 
                     text2='JUMLAH PEGAWAI : %s' % len(self.user), 
                     text3='STATUS : %s' % tulisan)
             
