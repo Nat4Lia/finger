@@ -1,0 +1,8 @@
+#ingore instansi_id.py
+instansi_id.py
+
+#ignore file dengan ekstensi pyc
+*.pyc
+
+#ignore file dengan ekstensi txt
+*.txt
