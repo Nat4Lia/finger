@@ -2,6 +2,7 @@ from check_connection import connection_on
 import lcd_
 from rpidatabase import RpiDatabase
 from rpidatabase import checking_table
+from update import try_update
 def check_ip_config () :
     try :
         from instansi_id import ipaddress as ip
@@ -38,6 +39,7 @@ if __name__ == '__main__' :
     else :
         lcd_.teks(text1='RASPBERRY MENGGUNAKAN', text2='%s BUAH FINGERPRINT' % len(list_used_ip_fp))
         while True :
+            try_update()
             for ip_mesin in list_used_ip_fp :   
                 print 'play'
                 play(ip_mesin)
