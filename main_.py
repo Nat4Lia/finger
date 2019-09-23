@@ -58,7 +58,7 @@ def ping(address, device_mac) :
                 DEVICE_UNREGISTERED += 1
 try :
     # '''Tampilkan Logo'''
-    tampil_gambar('logo_prov.png')
+    tampil_gambar('/etc/finger/logo_prov.png')
     time.sleep(3)
     tampil_gauges(0, 'STARTING...')
     time.sleep(2)

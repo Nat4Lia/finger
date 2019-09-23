@@ -98,7 +98,7 @@ x = 0
 
 
 # Load default font.
-font = ImageFont.truetype('Retron2000.ttf',14)
+font = ImageFont.truetype('/etc/finger/Retron2000.ttf',14)
 
 # Alternatively load a TTF font.  Make sure the .ttf font file is in the same directory as the python script!
 # Some other nice fonts to try: http://www.dafont.com/bitmap.php
