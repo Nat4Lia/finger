@@ -817,16 +817,17 @@ def play(ip_address) :
             elif trigger is 2 :
                 _MainProgram.validasi_user()
             elif trigger is 3 :
-                try:
-                    version     = (API().get_server(api['Versi']))['version']
-                except Exception :    
-                    version     = 'ServerConnectionError'
+                pass
+                # try:
+                #     version     = (API().get_server(api['Versi']))['version']
+                # except Exception :    
+                #     version     = 'ServerConnectionError'
 
-                if RpiDatabase().is_version_same(version):
-                    lcd_.teks(text1='RASPBERRY', text2='SUDAH', text3='TERUPDATE')
-                    time.sleep(1.2)
-                else :
-                    update(version)
+                # if RpiDatabase().is_version_same(version):
+                #     lcd_.teks(text1='RASPBERRY', text2='SUDAH', text3='TERUPDATE')
+                #     time.sleep(1.2)
+                # else :
+                #     update(version)
             elif trigger is 4 :
                 if RpiDatabase().is_table_zero('attendance') :
                     RpiDatabase().truncate('attendance')
