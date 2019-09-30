@@ -1,5 +1,5 @@
 from instansi_id import ID_INSTANSI
-versi_software      =   '3.1.0'
+versi_software      =   '3.2.0'
 server_url          =   'http://eabsen.kalselprov.go.id'
 skpd                =    ID_INSTANSI
 mysql_config        = {
