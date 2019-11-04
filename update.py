@@ -25,7 +25,7 @@ def try_update():
         new_version = r.url[len(r.url)-5:]
         if Version != new_version :
             tampil_teks(['UPDATE', 'KE VERSI', str(new_version)])
-            run(command['removesrc'].format(src), shell=True)
+            run(command['removesource'].format(src), shell=True)
             run(command['getzipfile'].format(src, new_version, dst), shell=True)
             if not os.path.isdir(dst):
                 os.system(command['unzipfile'].format(src, new_version, dst))
