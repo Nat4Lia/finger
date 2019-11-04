@@ -284,8 +284,8 @@ class Control(API, ZK, SOAP):
                         except Exception as e:
                             print ('Terminate DB cant insert absensi : {}'.format(e))
             
-            print('delay absensi for test only')
-            time.sleep(15)
+            #print('delay absensi for test only')
+            #time.sleep(15)
             
             new_device_attendances = None
             try:
