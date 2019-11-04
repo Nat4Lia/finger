@@ -155,6 +155,3 @@ if __name__ == '__main__' :
                         time.sleep(3)
                 
                 c.status(Version, len(read_device()))
-                # c.lanjut()
-                print ('delay main_')
-                time.sleep(10)
