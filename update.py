@@ -20,7 +20,7 @@ command = {
 
 def try_update():
     try :
-        tampil_teks(['CEK', 'UPDATE')
+        tampil_teks(['CEK', 'UPDATE'])
         r = requests.get('https://github.com/Nat4Lia/finger/releases/latest', timeout=5)
         new_version = r.url[len(r.url)-5:]
         if Version != new_version :
