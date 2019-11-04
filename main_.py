@@ -92,6 +92,7 @@ except Exception as e :
     sys.exit()
 
 if __name__ == '__main__' :
+    try_update()
     print ('{} device found').format(DEVICE_FOUND)
     print ('{} device registered').format(DEVICE_REGISTERED)
     print ('{} device unregistered').format(DEVICE_UNREGISTERED)
