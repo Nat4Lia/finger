@@ -28,14 +28,18 @@ def try_update():
             run(command['removesource'].format(src), shell=True)
             run(command['getzipfile'].format(src, new_version, dst), shell=True)
             if not os.path.isdir(dst):
+                tampil_teks(['UPDATE', '...'])
                 os.system(command['unzipfile'].format(src, new_version, dst))
                 tampil_teks(['UPDATE', 'BERHASIL'])
             else :
+                tampil_teks(['UPDATE', '...'])
                 os.chdir(dst)
                 os.system(command['rmexcept'])
                 os.system(command['unzipfile'].format(src, new_version, new_version, dst))
                 os.system(command['removezip'].format(src, new_version))
                 tampil_teks(['UPDATE', 'BERHASIL'])
+                tampil_teks(['REBOOT', '...'])
+                os.system(command['reboot'])
         else :
             tampil_teks(['TIDAK ADA', 'UPDATE'])
     except Exception as e :
