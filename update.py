@@ -32,7 +32,7 @@ def try_update():
                 tampil_teks(['UPDATE', 'BERHASIL'])
             else :
                 os.chdir(dst)
-                os.system(command['rmallex'])
+                os.system(command['rmexcept'])
                 os.system(command['unzipfile'].format(src, new_version, new_version, dst))
                 os.system(command['removezip'].format(src, new_version))
                 tampil_teks(['UPDATE', 'BERHASIL'])
