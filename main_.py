@@ -87,7 +87,7 @@ except Exception as e :
     time.sleep(5)
     tampil_teks(['PROGRAM', 'EXIT'])
     time.sleep(5)
-    tampil_teks(['REBOOT TO', 'START AGAIN'])
+    tampil_teks(['HARAP', 'NYALAKAN ULANG'])
     time.sleep(5)
     sys.exit()
 
