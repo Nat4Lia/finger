@@ -43,9 +43,6 @@ def try_update() :
         else :
             teks('TIDAK ADA','UPDATE')
             time.sleep(2)
-        else :
-            teks('TIDAK ADA','UPDATE')
-            time.sleep(2)
     except Exception as e :
         print ('Update Error : {}').format(e)
         teks('UPDATE', 'GAGAL')
