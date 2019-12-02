@@ -1,5 +1,5 @@
 from instansi_id import ID_INSTANSI
-versi_software      =   '3.3.0'
+versi_software      =   '3.4.0'
 server_url          =   'http://eabsen.kalselprov.go.id'
 skpd                =    ID_INSTANSI
 mysql_config        = {
@@ -84,7 +84,7 @@ maccaddress_table   =   {
                                         'structure' : 'varchar(20) not null',
                                         'index'     : []
                                     }
-                                    
+
                                 ],
                                 'index' : []
                             }
@@ -98,7 +98,7 @@ version_table       =   {
                                         'name' : 'version',
                                         'structure' : 'varchar(20) not null',
                                         'index'     : []
-                                    }  
+                                    }
                                 ],
                                 'index' : []
                         }
@@ -116,8 +116,8 @@ server_api_param    =   {
                             'GetQueue'      :   'queuepegawai/get',
                             'PostQueue'     :   'queuepegawai/post'
 }
- 
-fp_payload          =   {  
+
+fp_payload          =   {
                             'GetAttLog'         : '<GetAttLog><ArgComKey xsi:type=\"xsd:integer\">0</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">%s</PIN></Arg></GetAttLog>',
                             'GetUserTemplate'   : '<GetUserTemplate><ArgComKey xsi:type=\"xsd:integer\">0</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">%s</PIN><FingerID xsi:type=\"xsd:integer\">%s</FingerID></Arg></GetUserTemplate>',
                             'GetUserInfo'       : '<GetUserInfo><ArgComKey Xsi:type=\"xsd:integer\">0</ArgComKey><Arg><PIN Xsi:type=\"xsd:integer\">%s</PIN></Arg></GetUserInfo>',
