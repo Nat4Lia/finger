@@ -130,11 +130,11 @@ def lapor_employee(mac_address, ip_address, queue_id, skpd=skpd) :
 def clear_all_attendance () :
     RpiDatabase().truncate('attendance')
 #
-      
+
 # menghapus semua tabel attendance berdasarkan mac
 def clear_attendance_by_mac (_macaddress) :
-    RpiDatabase().delete_by_mac(_macaddress) 
-#          
+    RpiDatabase().delete_by_mac(_macaddress)
+#
 
 #inisialisasi awal program start
 
@@ -152,7 +152,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
         self.is_mesin_registered = self.is_macaddress_registered(self.mac_address)
         self.count_attendance_sent = self.get_all_attendace_sent(self.mac_address)
 
-#Pengiriman Absen        
+#Pengiriman Absen
     def send_attendance(self) :
         if self.is_mesin_registered : #Jika Mesin Terdaftar
         #ambil jumlah absensi yg terkirim
@@ -162,10 +162,10 @@ class MainProgram(RpiDatabase, API, Mesin) :
         #ambil row failed
             get_row_local_att_failed = self.get_failed_flag(self.mac_address)
         #
-        
+
         #jika datanya ada
-            if ((get_row_local_att_failed is not None) 
-                and 
+            if ((get_row_local_att_failed is not None)
+                and
                 (attendance_sent is not None)
                 and
                 (self.attendance is not None)) :
@@ -207,10 +207,10 @@ class MainProgram(RpiDatabase, API, Mesin) :
                         # kirimkan absensi
                             _send_attendance = self.post_server(
                                 api['Absensi'], {
-                                    'status'    : attendance['Status'], 
-                                    'instansi'  : skpd, 
-                                    'jam'       : attendance['Jam'], 
-                                    'tanggal'   : attendance['Tanggal'], 
+                                    'status'    : attendance['Status'],
+                                    'instansi'  : skpd,
+                                    'jam'       : attendance['Jam'],
+                                    'tanggal'   : attendance['Tanggal'],
                                     'user_id'   : attendance['PIN'],
                                     'macaddress': self.mac_address,
                                     'token'     : token
@@ -234,7 +234,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                 )
                             else :
                                 lcd_.teks(text1='KONEKSI', text2='SERVER', text3='BERMASALAH')
-                                time.sleep(1.2) 
+                                time.sleep(1.2)
                                 lcd_.teks(text1='TIDAK DAPAT', text2='MENGIRIM ABSENSI', text3='KE SERVER')
                                 time.sleep(1.2)
                                 raise Exception
@@ -263,7 +263,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                 # print 'KESALAHAN PADA DATABASE RASPBERRY'
                 # print 'HARAP RESTART RASPBERRY'
                 # print 'JIKA PESAN INI SELALU MUNCUL, SEGERA HUBUNGI DISKOMINFO'
-            
+
         else :
             lcd_.teks(text1='PERIKSA APAKAH', text2='MESIN TERDAFTAR', text3='DI DISKOMINFO')
             time.sleep(1.2)
@@ -286,7 +286,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                     )
         try :
             if api_pegawai is 'ServerConnectionError' :
-                raise Exception 
+                raise Exception
             else :
                 if self.user is None :
                     raise Exception
@@ -310,7 +310,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                 time.sleep(1.2)
                                 # print 'LAPORAN '+laporan
                                 # print 'SUDAH TERDAFTAR'
-                            #    
+                            #
                             elif cek is False :
                             #belum terdaftar
                             #mengambil data api sidik jari
@@ -378,7 +378,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                         elif set_pegawai is None :
                                             raise Exception
                                     #
-                            #        
+                            #
                             #
                             elif cek is None :
                                 raise Exception
@@ -410,7 +410,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                                 # print 'SUKSES GANTI KE PASSWORD'
                                                 lcd_.teks(text1=data['nama'], text2='GANTI KE', text3='PASSWORD')
                                                 time.sleep(1.2)
-                                                
+
                                             elif set_pegawai is False :
                                                 lcd_.teks(text1=data['nama'], text2='GAGAL GANTI KE', text3='PASSWORD')
                                                 time.sleep(1.2)
@@ -503,7 +503,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
             lcd_.teks(text1='TERJADI KESALAHAN', text2='MANAGEMENT', text3='EMPLOYEE')
             time.sleep(1.2)
             # print 'error'+str(error)
-#        
+#
 
 #Pengiriman Status
     def status_data(self) :
@@ -534,17 +534,17 @@ class MainProgram(RpiDatabase, API, Mesin) :
                     'jumlahabsensilocal'    : self.get_success_flag(self.mac_address),
                     'instansi_id'           : skpd,
                     'token'                 : token
-                    
+
                 }
             )
             if _send_status is 'Success' or _send_status is 'Failed' :
                 tulisan = 'CONNECTED'
             else :
                 tulisan = 'DISCONNECTED'
-            lcd_.teks(text1='VERSI : %s' % versi_software, 
-                    text2='JUMLAH PEGAWAI : %s' % len(self.user), 
+            lcd_.teks(text1='VERSI : %s' % versi_software,
+                    text2='JUMLAH PEGAWAI : %s' % len(self.user),
                     text3='STATUS : %s' % tulisan)
-            
+
         except TypeError as error :
             logger.error(error)
             # print 'Koneksi Fingerprint Error'
@@ -555,7 +555,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
         api_admin         = self.get_server(api['Admin'])
         try :
             if api_admin is 'ServerConnectionError' :
-                raise Exception 
+                raise Exception
             else :
                 if self.admin is None :
                     raise Exception
@@ -618,7 +618,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
             run('sudo reboot', shell=True)
         else :
             pass
-            
+
 
 # validasi user
     def validasi_user(self) :
@@ -653,10 +653,10 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                 self.delete_user(user_mesin['PIN'])
         except Exception as error :
             logger.error(error)
-            # print error   
+            # print error
 #
 
-#Pengiriman Absen Khusus     
+#Pengiriman Absen Khusus
     def spesific_send_attendance(self, tanggal) :
         from datetime import datetime
         if self.is_mesin_registered : #Jika Mesin Terdaftar
@@ -667,7 +667,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
         #ambil row failed
         #    get_row_local_att_failed = self.get_failed_flag(self.mac_address)
         #
-        
+
         #jika data attendance dari fingerprint ada
             if self.attendance is not None :
 
@@ -727,10 +727,10 @@ class MainProgram(RpiDatabase, API, Mesin) :
                         # kirimkan absensi
                             _send_attendance = self.post_server(
                                 api['Absensi'], {
-                                    'status'    : attendance['Status'], 
-                                    'instansi'  : skpd, 
-                                    'jam'       : attendance['Jam'], 
-                                    'tanggal'   : attendance['Tanggal'], 
+                                    'status'    : attendance['Status'],
+                                    'instansi'  : skpd,
+                                    'jam'       : attendance['Jam'],
+                                    'tanggal'   : attendance['Tanggal'],
                                     'user_id'   : attendance['PIN'],
                                     'macaddress': self.mac_address,
                                     'token'     : token
@@ -754,7 +754,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                                 )
                             else :
                                 lcd_.teks(text1='KONEKSI', text2='SERVER', text3='BERMASALAH')
-                                time.sleep(1.2) 
+                                time.sleep(1.2)
                                 lcd_.teks(text1='TIDAK DAPAT', text2='MENGIRIM ABSENSI', text3='KE SERVER')
                                 time.sleep(1.2)
                                 raise Exception
@@ -783,7 +783,7 @@ class MainProgram(RpiDatabase, API, Mesin) :
                 # print 'KESALAHAN PADA DATABASE RASPBERRY'
                 # print 'HARAP RESTART RASPBERRY'
                 # print 'JIKA PESAN INI SELALU MUNCUL, SEGERA HUBUNGI DISKOMINFO'
-            
+
         else :
             lcd_.teks(text1='PERIKSA APAKAH', text2='MESIN TERDAFTAR', text3='DI DISKOMINFO')
             time.sleep(1.2)
@@ -791,36 +791,37 @@ class MainProgram(RpiDatabase, API, Mesin) :
             time.sleep(1.2)
             # print 'PERIKSA APAKAH MESIN SUDAH TERDAFTAR DI DISKOMINFO'
             # print 'PERIKSA KEMBALI KONEKSI MESIN DENGAN RASPBERRY'
-# 
+#
 
 #Fungsi Utama
 def play(ip_address) :
     # save_macaddress()
+    global trigger_api, trigger, spesific_date, spesific_instansi
     _MainProgram = MainProgram(ip_address)
-    try :
+    try:
         trigger_api = API().get_server(api['Trigger'])[0]
-        trigger     = trigger_api['status']
+        trigger = trigger_api['status']
         spesific_date = trigger_api['patokantanggal']
         spesific_instansi = trigger_api['instansi_id']
-    except Exception :
-        trigger_api     = 'ServerConnectionError'
-    
-    try :
-        if _MainProgram.is_mesin_registered :
+    except Exception:
+        trigger_api = 'ServerConnectionError'
+
+    try:
+        if _MainProgram.is_mesin_registered:
             _MainProgram.management_admin()
             _MainProgram.status_data()
-            if trigger is 1 :
+            if trigger == 1:
                 # print 'main'
                 _MainProgram.send_attendance()
                 _MainProgram.management_employee()
                 _MainProgram.clear_absensi()
-            elif trigger is 2 :
+            elif trigger == 2:
                 _MainProgram.validasi_user()
-            elif trigger is 3 :
+            elif trigger == 3:
                 pass
                 # try:
                 #     version     = (API().get_server(api['Versi']))['version']
-                # except Exception :    
+                # except Exception :
                 #     version     = 'ServerConnectionError'
 
                 # if RpiDatabase().is_version_same(version):
@@ -828,27 +829,27 @@ def play(ip_address) :
                 #     time.sleep(1.2)
                 # else :
                 #     update(version)
-            elif trigger is 4 :
-                if RpiDatabase().is_table_zero('attendance') :
+            elif trigger == 4:
+                if RpiDatabase().is_table_zero('attendance'):
                     RpiDatabase().truncate('attendance')
                     lcd_.teks(text1='MENGHAPUS', text2='DATA', text3='ATTENDANCE')
                     time.sleep(1.2)
                     run('sudo reboot', shell=True)
-                else :
+                else:
                     lcd_.teks(text1='DATA ATTENDANCE', text2='KOSONG')
                     time.sleep(1.2)
-            elif trigger is 5 :
+            elif trigger == 5:
                 if (spesific_instansi == skpd) or (spesific_instansi is None):
                     _MainProgram.spesific_send_attendance(spesific_date)
                     _MainProgram.management_employee()
-                else :
+                else:
                     lcd_.teks(text2='MENUNGGU', text3='HARAP SABAR')
                     time.sleep(1.2)
-            elif trigger_api is 'ServerConnectionError' :
+            elif trigger_api == 'ServerConnectionError':
                 raise Exception
-            else :
+            else:
                 pass
-        else :
+        else:
             lcd_.teks(text1='PERIKSA APAKAH', text2='MESIN TERDAFTAR')
             time.sleep(1.2)
             lcd_.teks(text1='JIKA PESAN INI', text2='SELALU MUNCUL')
@@ -860,4 +861,3 @@ def play(ip_address) :
         # print error
         # print 'error new_main_program'
 #
-    
