@@ -65,5 +65,5 @@ def try_update():
         else:
             raise Exception
     except Exception as e:
-        teks('Update Error : {}').format(e)
+        # teks('Update Error : {}').format(e)
         teks('UPDATE', 'GAGAL')
