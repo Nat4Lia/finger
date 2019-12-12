@@ -38,13 +38,15 @@ def get_new_version():
 def download_file(new_version):
     url_file = 'https://github.com/Nat4Lia/finger/archive/v{}.zip'.format(
         new_version)
-    filepath = '/home/pi/download/v{}.zip'
+    filepath = '/home/pi/download/v{}.zip'.format(new_version)
     retry = 5  # retry download 5 times
     counter = 1  # retry counter teks
     while retry > 0:
         try:
             request_file = requests.get(url_file, timeout=5, stream=True)
             if request_file.status_code == 200:
+                if os.path.isdir('/home/pi/download'):
+                    os.system('mkdir /home/pi/download')
                 with open(filepath, 'wb') as f:
                     total_size = int(
                         request_file.headers.get('content-length', 0))
