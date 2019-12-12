@@ -50,7 +50,7 @@ def download_file(new_version):
                 with open(filepath, 'wb') as f:
                     total_size = int(
                         request_file.headers.get('content-length', 0))
-                    block_size = 1024
+                    block_size = 1024 * 10
                     progress = 0
                     for data in request_file.iter_content(block_size):
                         progress = progress + len(data)
@@ -59,7 +59,6 @@ def download_file(new_version):
                         lcd_.disp.image(lcd_.image)
                         lcd_.disp.display()
                         f.write(data)
-                        time.sleep(.5)
                     f.close()
                 break
             else:
