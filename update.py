@@ -6,7 +6,7 @@ import json
 import lcd_
 
 global Version, src, dst, command, r, new_version, filepath, file
-Version = '3.4.1'
+Version = '3.4.0'
 src = '/home/pi/finger'
 dst = '/etc/finger'
 command = {
@@ -28,7 +28,7 @@ def get_new_version():
     try:
         r = requests.get('http://eabsen.kalselprov.go.id/api/version')
         if r.status_code == requests.codes.ok:
-            return json.loads(r.content)['version']
+            return '3.4.1'  # json.loads(r.content)['version']
         else:
             raise requests.exceptions.RequestException
     except requests.exceptions.RequestException:
@@ -59,7 +59,8 @@ def download_file(new_version):
                 f.close()
         else:
             raise Exception
-    except Exception:
+    except Exception as e:
+        print ('download error : {}').format(e)
         if os.path.isfile(filepath):
             os.remove(filepath)
     return os.path.isfile(filepath)
@@ -105,5 +106,9 @@ def try_update():
                 time.sleep(2)
         else:
             lcd_.teks('GAGAL', 'MENDAPATKAN', 'VERSI TERBARU')
-    except Exception:
+    except Exception as e:
+        print ('update error : {}').format(e)
         lcd_.teks('UPDATE', 'GAGAL')
+
+
+try_update()
