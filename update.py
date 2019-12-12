@@ -3,7 +3,7 @@ from subprocess import check_call as run
 import requests
 import time
 import json
-from lcd_ import teks, progress_bar
+import lcd_
 
 global Version, src, dst, command, r, new_version, filepath
 Version = '3.4.0'
@@ -54,8 +54,10 @@ def download_file(new_version):
                     progress = 0
                     for data in request_file.iter_content(block_size):
                         progress = progress + len(data)
-                        progress_bar(
+                        lcd_.progress_bar(
                             progress, total_size, text="DOWNLOAD UPDATE")
+                        lcd_.disp.image(lcd_.image)
+                        lcd_.disp.display()
                         f.write(data)
                         time.sleep(.5)
                     f.close()
@@ -63,7 +65,7 @@ def download_file(new_version):
             else:
                 raise Exception
         except Exception:
-            teks('DOWNLOAD', 'GAGAL', counter)
+            lcd_.teks('DOWNLOAD', 'GAGAL', counter)
             time.sleep(.5)
             if os.path.isfile(filepath):
                 os.remove(filepath)
@@ -87,14 +89,14 @@ def unzip_file(new_version):
 
 def try_update():
     try:
-        teks('CEK', 'UPDATE')
+        lcd_.teks('CEK', 'UPDATE')
         new_version = get_new_version()  # Mendapatkan versi terbaru
         if new_version:
             if Version < new_version:
-                teks('UPDATE', 'KE VERSI', str(new_version))
+                lcd_.teks('UPDATE', 'KE VERSI', str(new_version))
                 if download_file(new_version):  # download file dari github
                     if unzip_file(new_version):  # unzip file hasil download
-                        teks('UPDATE...')
+                        lcd_.teks('UPDATE...')
                         if not os.path.isdir(dst):
                             os.system(command['copy'])
                         else:
@@ -102,15 +104,15 @@ def try_update():
                             os.system(command['rmexcept'])
                             os.system(command['copy'])
                         os.system(command['removezip'].format(new_version))
-                        teks('REBOOT...')
+                        lcd_.teks('REBOOT...')
                         os.system(command['reboot'])
                     else:
                         raise Exception
                 raise Exception
             else:
-                teks('TIDAK ADA', 'UPDATE')
+                lcd_.teks('TIDAK ADA', 'UPDATE')
                 time.sleep(2)
         else:
-            teks('GAGAL', 'MENDAPATKAN', 'VERSI TERBARU')
+            lcd_.teks('GAGAL', 'MENDAPATKAN', 'VERSI TERBARU')
     except Exception:
-        teks('UPDATE', 'GAGAL')
+        lcd_.teks('UPDATE', 'GAGAL')
