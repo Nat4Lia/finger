@@ -45,7 +45,7 @@ def download_file(new_version):
         try:
             request_file = requests.get(url_file, timeout=5, stream=True)
             if request_file.status_code == 200:
-                if os.path.isdir('/home/pi/download'):
+                if not os.path.isdir('/home/pi/download'):
                     os.system('mkdir /home/pi/download')
                 with open(filepath, 'wb') as f:
                     total_size = int(
