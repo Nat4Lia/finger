@@ -5,8 +5,8 @@ import time
 import json
 import lcd_
 
-global Version, src, dst, command, r, new_version, filepath
-Version = '3.4.0'
+global Version, src, dst, command, r, new_version, filepath, file
+Version = '3.4.1'
 src = '/home/pi/finger'
 dst = '/etc/finger'
 command = {
@@ -39,38 +39,29 @@ def download_file(new_version):
     url_file = 'https://github.com/Nat4Lia/finger/archive/v{}.zip'.format(
         new_version)
     filepath = '/home/pi/download/v{}.zip'.format(new_version)
-    retry = 5  # retry download 5 times
-    counter = 1  # retry counter teks
-    while retry > 0:
-        try:
-            request_file = requests.get(url_file, timeout=5, stream=True)
-            if request_file.status_code == 200:
-                if not os.path.isdir('/home/pi/download'):
-                    os.system('mkdir /home/pi/download')
-                with open(filepath, 'wb') as f:
-                    total_size = int(
-                        request_file.headers.get('content-length', 0))
-                    block_size = 1024 * 10
-                    progress = 0
-                    for data in request_file.iter_content(block_size):
-                        progress = progress + len(data)
-                        lcd_.progress_bar(
-                            progress, total_size, text="DOWNLOAD UPDATE")
-                        lcd_.disp.image(lcd_.image)
-                        lcd_.disp.display()
-                        f.write(data)
-                    f.close()
-                break
-            else:
-                raise Exception
-        except Exception:
-            lcd_.teks('DOWNLOAD', 'GAGAL', counter)
-            time.sleep(.5)
-            if os.path.isfile(filepath):
-                os.remove(filepath)
-            retry = retry - 1
-            counter = counter + 1
-            continue
+    try:
+        request_file = requests.get(url_file, timeout=5, stream=True)
+        if request_file.status_code == 200:
+            if not os.path.isdir('/home/pi/download'):
+                os.system('mkdir /home/pi/download')
+            with open(filepath, 'wb') as f:
+                total_size = int(
+                    request_file.headers.get('content-length', 0))
+                block_size = 1024 * 10
+                progress = 0
+                for data in request_file.iter_content(block_size):
+                    progress = progress + len(data)
+                    lcd_.progress_bar(
+                        progress, total_size, text="DOWNLOAD UPDATE")
+                    lcd_.disp.image(lcd_.image)
+                    lcd_.disp.display()
+                    f.write(data)
+                f.close()
+        else:
+            raise Exception
+    except Exception:
+        if os.path.isfile(filepath):
+            os.remove(filepath)
     return os.path.isfile(filepath)
 
 
@@ -93,7 +84,19 @@ def try_update():
         if new_version:
             if Version < new_version:
                 lcd_.teks('UPDATE', 'KE VERSI', str(new_version))
-                if download_file(new_version):  # download file dari github
+                retry = 5
+                counter = 1
+                while retry > 0:
+                    file = download_file(new_version)
+                    if file:
+                        break
+                    else:
+                        lcd_.teks("DOWNLOAD", "GAGAL", counter)
+                        time.sleep(.5)
+                        retry = retry - 1
+                        counter = counter + 1
+                        continue
+                if file:  # download file dari github
                     if unzip_file(new_version):  # unzip file hasil download
                         lcd_.teks('UPDATE...')
                         if not os.path.isdir(dst):
@@ -107,7 +110,6 @@ def try_update():
                         os.system(command['reboot'])
                     else:
                         raise Exception
-                raise Exception
             else:
                 lcd_.teks('TIDAK ADA', 'UPDATE')
                 time.sleep(2)
