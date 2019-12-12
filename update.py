@@ -84,19 +84,7 @@ def try_update():
         if new_version:
             if Version < new_version:
                 lcd_.teks('UPDATE', 'KE VERSI', str(new_version))
-                retry = 5
-                counter = 1
-                while retry > 0:
-                    file = download_file(new_version)
-                    if file:
-                        break
-                    else:
-                        lcd_.teks("DOWNLOAD", "GAGAL", counter)
-                        time.sleep(.5)
-                        retry = retry - 1
-                        counter = counter + 1
-                        continue
-                if file:  # download file dari github
+                if download_file(new_version):  # download file dari github
                     if unzip_file(new_version):  # unzip file hasil download
                         lcd_.teks('UPDATE...')
                         if not os.path.isdir(dst):
@@ -110,6 +98,8 @@ def try_update():
                         os.system(command['reboot'])
                     else:
                         raise Exception
+                else:
+                    raise Exception
             else:
                 lcd_.teks('TIDAK ADA', 'UPDATE')
                 time.sleep(2)
