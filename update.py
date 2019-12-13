@@ -49,7 +49,7 @@ def download_file(new_version):
                 os.system('mkdir /home/pi/download')
             with open(filepath, 'wb') as f:
                 total_size = int(
-                    request_file.headers.get('content-length', 0))
+                    len(request_file.content))
                 block_size = 1024 * 10
                 progress = 0
                 for data in request_file.iter_content(block_size):
