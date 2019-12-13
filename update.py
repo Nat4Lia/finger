@@ -20,7 +20,8 @@ command = {
     'reboot': 'sudo reboot',
     'removezip': 'sudo rm -rf /home/pi/download/v{}.zip',
     'rename': 'sudo mv /home/pi/finger-{} /home/pi/finger',
-    'copy': 'sudo cp -R /home/pi/finger /etc/'
+    'copy': 'sudo cp -R /home/pi/finger /etc/',
+    'rmdirfinger': 'sudo rm -rf /home/pi/finger/'
 }
 
 
@@ -90,10 +91,16 @@ def try_update():
                         if not os.path.isdir(dst):
                             os.system(command['copy'])
                         else:
-                            os.chdir(dst)
-                            os.system(command['rmexcept'])
+                            os.chdir(dst)  # masuk direktori /etc/finger
+                            os.system(command['rmexcept'])  # hapus semua
+                            # kecuali instansi_id
                             os.system(command['copy'])
+                            # copy replace all dari /home/pi/finger
+                            # ke /etc/finger
                         os.system(command['removezip'].format(new_version))
+                        # hapus file zip
+                        os.system(command['removezip'])
+                        # hapus direktori /home/pi/finger
                         lcd_.teks('REBOOT...')
                         os.system(command['reboot'])
                     else:
