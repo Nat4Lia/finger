@@ -100,7 +100,7 @@ def try_update():
                             # ke /etc/finger
                         os.system(command['removezip'].format(new_version))
                         # hapus file zip
-                        os.system(command['removezip'])
+                        os.system(command['rmdirfinger'])
                         # hapus direktori /home/pi/finger
                         lcd_.teks('REBOOT...')
                         os.system(command['reboot'])
