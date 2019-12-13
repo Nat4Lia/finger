@@ -40,7 +40,9 @@ def download_file(new_version):
         new_version)
     filepath = '/home/pi/download/v{}.zip'.format(new_version)
     try:
-        request_file = requests.get(url_file, timeout=5, stream=True)
+        request_file = requests.get(
+            url_file, timeout=5, stream=True,
+            headers={'Accept-Encoding': None})
         if request_file.status_code == 200:
             if not os.path.isdir('/home/pi/download'):
                 os.system('mkdir /home/pi/download')
