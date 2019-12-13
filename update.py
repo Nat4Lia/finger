@@ -41,14 +41,12 @@ def download_file(new_version):
     filepath = '/home/pi/download/v{}.zip'.format(new_version)
     try:
         request_file = requests.get(
-            url_file, timeout=5, stream=True,
-            headers={'Accept-Encoding': None})
+            url_file, timeout=5, stream=True)
         if request_file.status_code == 200:
             if not os.path.isdir('/home/pi/download'):
                 os.system('mkdir /home/pi/download')
             with open(filepath, 'wb') as f:
-                total_size = int(
-                    request_file.headers.get('content-length', 0))
+                total_size = int(len(request_file.content))
                 block_size = 1024 * 10
                 progress = 0
                 for data in request_file.iter_content(block_size):
